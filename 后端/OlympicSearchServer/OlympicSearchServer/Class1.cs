@@ -1,8 +1,11 @@
 ﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Net;
 using System.Text;
 using System.Web.Http;
 using static OlympicSearchServer.DateMatchDetails;
+using static OlympicSearchServer.DateMatchDetails.Units.Competitors;
 using static OlympicSearchServer.MatchNameData.Props.PageProps.InitialFilterDisciplines;
 
 namespace OlympicSearchServer
@@ -28,10 +31,6 @@ namespace OlympicSearchServer
         public static string GetDailyFixturesHttp(string date)
         {
             return $"https://sph-s-api.olympics.com/summer/schedules/api/CHI/schedule/day/{date}";
-        }
-        public static string GetBracketHttp(string id)
-        {
-            return $"https://olympics.com/OG2024/data/GLO_Bracket~comp=OG2024~rsc={id}~lang=CHI.json";
         }
         public void ReadAllMatchData()
         {
@@ -102,6 +101,7 @@ namespace OlympicSearchServer
         {
             BattleTableData result = new();
             string savePath = Path.Combine(ResourcesPath, "BracketData", id+".json");
+
             //获取已经存在的数据
             if (File.Exists(savePath))
             {
@@ -112,9 +112,12 @@ namespace OlympicSearchServer
             //若不存在则获取
            
             BattleTable data = new();
-            string httpPath = GetBracketHttp(id);
-            string jsonData = GetHttpJson(httpPath);
+            string httpPath = GetBracketTableHttp(id);
+            string jsonData = GetHttpJson(httpPath); 
             if (string.IsNullOrEmpty(jsonData)) return null;
+
+            Console.WriteLine(httpPath);
+
             data = JsonConvert.DeserializeObject<BattleTable>(jsonData);
             foreach(var a in data.bracket)
             {
@@ -167,18 +170,38 @@ namespace OlympicSearchServer
            
         }
 
+        public static bool Communicable(string http)
+        {
+          
+            string jsonData = GetHttpJson(http);
+            //Console.WriteLine(http);
+            //if (!jsonData[1].Equals('!')) Console.WriteLine(http);
+            //else
+            //{
+            //    Console.WriteLine("错误http");
+            //    Console.WriteLine(http);
+            //    Console.WriteLine();
+            //}
+            return !jsonData[1].Equals('!');
+        }
     }
     public class DataGetController : ApiController
     {
         public List<NationalMeadls> allNationalMedals = new();
         Dictionary<string, Disciplines> allMatchData = new();
-        public List<string> allMatchFirstName = new();
+        public List<string> allHasBracketMatchFirstName = new();
         public DataGetController()
         {
             allNationalMedals = JsonConvert.DeserializeObject<List<NationalMeadls>>(File.ReadAllText(DataPraser.NationalMedalsPath));
             allMatchData = JsonConvert.DeserializeObject<Dictionary<string, Disciplines>>(File.ReadAllText(DataPraser.MatchNameDataPath));
-            if (allMatchData != null) allMatchFirstName = allMatchData.Keys.ToList();
+            if (allMatchData != null)
+            {
+                allHasBracketMatchFirstName = allMatchData.Keys.ToList();
+                //删除所有无对阵表的
+                allHasBracketMatchFirstName.RemoveAll(x => !DataPraser.Communicable(DataPraser.GetBracketTableHttp(allMatchData[x].events[0].id)));
+            }
             else Console.WriteLine("数据初始化错误！");
+            foreach(var a in allHasBracketMatchFirstName)Console.WriteLine(a);
         }
 
         /// <summary>
@@ -189,12 +212,13 @@ namespace OlympicSearchServer
         public Result<List<string>> GetAllMatchName()
         {
             Result<List<string>> result = new();
-            if (allMatchFirstName.Count == 0)
+            if (allHasBracketMatchFirstName.Count == 0)
             {
                 result.code = 0;
                 result.message = "比赛名称数据为空，为服务器数据出错！";
             }
-            else result.data = allMatchData.Keys.ToList();
+            else result.data = allHasBracketMatchFirstName;
+            
             return result;
         }
         /// <summary>
@@ -203,12 +227,12 @@ namespace OlympicSearchServer
         /// <param name="firstName"></param>
         /// <returns></returns>
         [HttpGet]
-        public Result<List<string>> GetAllMatchDetailName(string firstName)
+        public Result<List<MatchDetailName>> GetAllMatchDetailName(string firstName)
         {
-            Result<List<string>> result = new();
+            Result<List<MatchDetailName>> result = new();
             if (allMatchData.ContainsKey(firstName))
             {
-                result.data = allMatchData[firstName].events.Select(x => x.name).ToList();
+                result.data = allMatchData[firstName].events.Select(x => new MatchDetailName() { id= x.id ,description=x.name}).ToList();
             }
             else
             {
@@ -243,6 +267,11 @@ namespace OlympicSearchServer
                 this.value1 = value1;
                 this.value2 = value2;
             }
+        }
+        public class MatchDetailName
+        {
+            public string id;
+            public string description;
         }
         Dictionary<string, Result<List<Units>>> saveDayResult=new();
         List<StringIntPair> useCheck = new();
@@ -310,6 +339,18 @@ namespace OlympicSearchServer
         //    data = JsonConvert.DeserializeObject<BattleTable>(jsonData);
         //    File.WriteAllText(Path.Combine(DataPraser.ResourcesPath,"TestBracket.json"), JsonConvert.SerializeObject(data,Formatting.Indented));
         //}
+        [HttpGet]
+        public Result<BattleTableData> GetBattleTable(string id)
+        {
+            Result<BattleTableData> result = new();
+            BattleTableData mid= DataPraser.GetBattleTable(id);
+            if (mid == null)
+            {
+                result.code = 0;
+                result.message = $"对阵表通信未成功！大概率是该比赛：{id} 为个人赛不支持对阵表";
+            }
+            return result;
+        }
 
     }
     [Serializable]

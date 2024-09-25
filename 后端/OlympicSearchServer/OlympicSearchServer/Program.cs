@@ -9,6 +9,8 @@ using System.Web.Http.SelfHost;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using OlympicSearchServer;
+using static OlympicSearchServer.DataGetController;
+using Newtonsoft.Json;
 
 namespace StudentDB_Scripts
 {
@@ -43,6 +45,27 @@ namespace StudentDB_Scripts
             //mid.ReadAllNationalMedalDetails();
             ///测试获取http上的json数据
             DataGetController test = new();
+
+            List<string> firstName = test.GetAllMatchName().data;
+
+            foreach (var a in firstName)
+            {
+                Console.WriteLine(a);
+                List<MatchDetailName> detailName = test.GetAllMatchDetailName(a).data;
+                foreach (var b in detailName)
+                {
+                    Console.WriteLine(b.description);
+                    test.GetBattleTable(b.id);
+                }
+            }
+
+            //List<MatchDetailName> detailName = test.GetAllMatchDetailName(firstName[1]).data;
+            //foreach (var b in detailName)
+            //{
+            //    test.GetBattleTable(b.id);
+            //}
+
+
             //test.GetDayResult("2024-08-01");
             //test.GetDayResult("2024-08-02");
             //test.GetDayResult("2024-08-03");
@@ -51,7 +74,7 @@ namespace StudentDB_Scripts
             //test.GetDayResult("2024-07-24");
             //test.GetDayResult("2024-08-04");
             //test.TestBracketValue();
-            DataPraser.GetBattleTable("FBLMTEAM11------------------------");
+            //DataPraser.GetBattleTable("FBLMTEAM11------------------------");
         }
 
     }
