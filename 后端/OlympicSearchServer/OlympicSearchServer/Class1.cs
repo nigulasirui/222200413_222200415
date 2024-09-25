@@ -98,6 +98,74 @@ namespace OlympicSearchServer
             return retString;
         }
 
+        public static BattleTableData GetBattleTable(string id)
+        {
+            BattleTableData result = new();
+            string savePath = Path.Combine(ResourcesPath, "BracketData", id+".json");
+            //获取已经存在的数据
+            if (File.Exists(savePath))
+            {
+                string json = File.ReadAllText(savePath);
+                result = JsonConvert.DeserializeObject<BattleTableData>(json);
+                return result;
+            }
+            //若不存在则获取
+           
+            BattleTable data = new();
+            string httpPath = GetBracketHttp(id);
+            string jsonData = GetHttpJson(httpPath);
+            if (string.IsNullOrEmpty(jsonData)) return null;
+            data = JsonConvert.DeserializeObject<BattleTable>(jsonData);
+            foreach(var a in data.bracket)
+            {
+                result.id = a.documentCode;
+                foreach (var b in a.bracketPhases)
+                {
+                    BattleTableData.BattleResult target;
+                    if (b.bracketItems.Count == 4)
+                    {
+                        target = result.qFinal;
+                       
+                    }else if (b.bracketItems.Count == 2)
+                    {
+                        target=result.halfFinal;
+                    }
+                    else
+                    {
+                        if(a.bracketCode.Equals("BRN")) target = result.final2;
+                        else target = result.final;        
+                    }
+
+
+                    foreach (var c in b.bracketItems)
+                    {
+                        target.description = c.eventUnit.description;
+                        BattleTableData.BattleResult.MatchResult matchResult = new();
+
+                        bool isWinner;
+                        BattleTable.Bracket.BracketPhases.BracketItems.BracketCompetitors bracketCompetitors;
+                        //参赛一
+                        bracketCompetitors = c.bracketCompetitors[0];
+                        isWinner = (bracketCompetitors.cp_wlt.Equals("W"));
+                        matchResult.competitor1 = new(bracketCompetitors.participant.organisation.code, bracketCompetitors.participant.organisation.description, bracketCompetitors.cp_result, isWinner);
+                        //参赛二
+                        bracketCompetitors = c.bracketCompetitors[1];
+                        isWinner = (bracketCompetitors.cp_wlt.Equals("W"));
+                        matchResult.competitor2 = new(bracketCompetitors.participant.organisation.code, bracketCompetitors.participant.organisation.description, bracketCompetitors.cp_result, isWinner);
+
+                        target.allMatch.Add(matchResult);
+                    }
+
+
+                }
+
+            }
+
+            File.WriteAllText(savePath, JsonConvert.SerializeObject(result));
+
+            return result;
+           
+        }
 
     }
     public class DataGetController : ApiController
@@ -244,13 +312,46 @@ namespace OlympicSearchServer
         //}
 
     }
-
-    public class BattleTable
+    [Serializable]
+    public class BattleTableData
     {
-
-
-
-
+        [Serializable]
+        public class BattleResult
+        {
+            [Serializable]
+            public class MatchResult
+            {
+                [Serializable]
+                public class Competitor
+                {
+                    public string countryEN;
+                    public string countryCN;
+                    public string score;
+                    public bool isWinner;
+                    public Competitor(string countryEN, string countryCN, string score, bool isWinner)
+                    {
+                        this.countryEN = countryEN;
+                        this.countryCN = countryCN;
+                        this.score = score;
+                        this.isWinner = isWinner;
+                    }
+                }
+                public Competitor competitor1, competitor2;
+            }
+            /// <summary>
+            /// 当前阶段的名称
+            /// </summary>
+            public string description;
+            /// <summary>
+            /// 所有当前阶段的比赛
+            /// </summary>
+            public List<MatchResult> allMatch=new();
+        }
+        /// <summary>
+        /// 表示是哪一个比赛
+        /// </summary>
+        public string id;
+        public BattleResult final=new(), final2=new(), halfFinal=new(), qFinal=new();
     }
 
 
@@ -499,10 +600,9 @@ namespace OlympicSearchServer
                 /// 根据这个的数量判断是半决赛，四分之一决赛还是奖牌赛
                 /// </summary>
                 public List<BracketItems> bracketItems;
-
-
-
             }
+            public string documentCode;
+            public string bracketCode;
             public List<BracketPhases> bracketPhases;
 
 

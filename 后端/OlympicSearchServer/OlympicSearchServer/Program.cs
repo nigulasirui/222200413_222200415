@@ -51,6 +51,7 @@ namespace StudentDB_Scripts
             //test.GetDayResult("2024-07-24");
             //test.GetDayResult("2024-08-04");
             //test.TestBracketValue();
+            DataPraser.GetBattleTable("FBLMTEAM11------------------------");
         }
 
     }
