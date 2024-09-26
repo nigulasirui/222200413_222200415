@@ -15,14 +15,28 @@ namespace OlympicSearchServer
     /// </summary>
     public class DataPraser
     {
-        public static string CrawlerDataPath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/crawlerData.json";
-        public static string MatchNameDataPath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/matchNameData.json";
-        public static string NationalMedalsPath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/nationalMedals.json";
+        //服务器使用
+        //C:\Users\Administrator\Documents\GitHub\222200413_222200415\后端\OlympicSearchServer\Resources
+        public static string CrawlerDataPath = "C:\\Users\\Administrator\\Documents\\GitHub\\222200413_222200415\\后端\\OlympicSearchServer\\Resources\\crawlerData.json";
+        public static string MatchNameDataPath = "C:\\Users\\Administrator\\Documents\\GitHub\\222200413_222200415\\后端\\OlympicSearchServer\\Resources\\matchNameData.json";
+        public static string NationalMedalsPath = "C:\\Users\\Administrator\\Documents\\GitHub\\222200413_222200415\\后端\\OlympicSearchServer\\Resources\\nationalMedals.json";
 
-        public static string TestDayResultPath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/testDayResult.json";
+        //public static string TestDayResultPath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/testDayResult.json";
 
-        public static string ResourcesPath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/OlympicSearchServer/Resources";
-        public static string DayResultSavePath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/OlympicSearchServer/Resources/DayResult";
+        public static string ResourcesPath = "C:\\Users\\Administrator\\Documents\\GitHub\\222200413_222200415\\后端\\OlympicSearchServer\\Resources";
+        public static string DayResultSavePath = "C:\\Users\\Administrator\\Documents\\GitHub\\222200413_222200415\\后端\\OlympicSearchServer\\Resources\\DayResult";
+
+
+
+        //调试使用
+        //public static string CrawlerDataPath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/crawlerData.json";
+        //public static string MatchNameDataPath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/matchNameData.json";
+        //public static string NationalMedalsPath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/nationalMedals.json";
+
+        //public static string TestDayResultPath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/testDayResult.json";
+
+        //public static string ResourcesPath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/OlympicSearchServer/Resources";
+        //public static string DayResultSavePath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/OlympicSearchServer/Resources/DayResult";
 
         public static string GetBracketTableHttp(string matchID)
         {
