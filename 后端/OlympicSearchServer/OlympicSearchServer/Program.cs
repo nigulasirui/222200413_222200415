@@ -46,6 +46,8 @@ namespace StudentDB_Scripts
             ///测试获取http上的json数据
             DataGetController test = new();
 
+
+
             List<string> firstName = test.GetAllMatchName().data;
 
             foreach (var a in firstName)
@@ -54,8 +56,8 @@ namespace StudentDB_Scripts
                 List<MatchDetailName> detailName = test.GetAllMatchDetailName(a).data;
                 foreach (var b in detailName)
                 {
-                    Console.WriteLine(b.description);
-                    test.GetBattleTable(b.id);
+                    Console.WriteLine($"{b.id}   {b.description}");
+                    test.GetBattleTable(b.id).data.ShowResult();
                 }
             }
 
@@ -75,6 +77,10 @@ namespace StudentDB_Scripts
             //test.GetDayResult("2024-08-04");
             //test.TestBracketValue();
             //DataPraser.GetBattleTable("FBLMTEAM11------------------------");
+
+
+            //var mid = DataPraser.Communicable("https://olympics.com/OG2024/data/GLO_Bracket~comp=OG2024~rsc=SHOMARM---------------------------~lang=CHI.json");
+            //Console.WriteLine($"{mid.Item1}   {mid.Item2}");
         }
 
     }

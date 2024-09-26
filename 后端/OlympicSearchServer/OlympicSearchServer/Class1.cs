@@ -102,6 +102,8 @@ namespace OlympicSearchServer
             BattleTableData result = new();
             string savePath = Path.Combine(ResourcesPath, "BracketData", id+".json");
 
+            
+
             //获取已经存在的数据
             if (File.Exists(savePath))
             {
@@ -110,69 +112,99 @@ namespace OlympicSearchServer
                 return result;
             }
             //若不存在则获取
-           
+
             BattleTable data = new();
             string httpPath = GetBracketTableHttp(id);
-            string jsonData = GetHttpJson(httpPath); 
-            if (string.IsNullOrEmpty(jsonData)) return null;
-
-            Console.WriteLine(httpPath);
-
-            data = JsonConvert.DeserializeObject<BattleTable>(jsonData);
-            foreach(var a in data.bracket)
+            var jsonResult = Communicable(httpPath);
+            if (!jsonResult.Item1) return null;
+            data = JsonConvert.DeserializeObject<BattleTable>(jsonResult.Item2);
+            try
             {
-                result.id = a.documentCode;
-                foreach (var b in a.bracketPhases)
+                foreach (var a in data.bracket)
                 {
-                    BattleTableData.BattleResult target;
-                    if (b.bracketItems.Count == 4)
+                    result.id = a.documentCode;
+                    Console.WriteLine(a.documentCode);
+                    if (!a.bracketCode.Equals("BRN") && !a.bracketCode.Equals("FNL")) continue;
+                    foreach (var b in a.bracketPhases)
                     {
-                        target = result.qFinal;
-                       
-                    }else if (b.bracketItems.Count == 2)
-                    {
-                        target=result.halfFinal;
+                        BattleTableData.BattleResult target;
+                        if (b.phaseCode.Equals("QFNL"))
+                        {
+                            target = result.qFinal;
+
+                        }
+                        else if (b.phaseCode.Equals("SFNL"))
+                        {
+                            target = result.halfFinal;
+                        }
+                        else if (b.bracketItems.Count == 1)
+                        {
+                            if (a.bracketCode.Equals("BRN")) target = result.final2;
+                            else if (b.phaseCode.Equals("FNL-")) target = result.final;
+                            else continue;
+                        }//若超过四分之一决赛，舍弃
+                        else continue;
+
+
+                        foreach (var c in b.bracketItems)
+                        {
+                            target.description = c.eventUnit.description;
+                            BattleTableData.BattleResult.MatchResult matchResult = new();
+
+                            bool isWinner;
+                            BattleTable.Bracket.BracketPhases.BracketItems.BracketCompetitors bracketCompetitors;
+                            //参赛一
+                            bracketCompetitors = c.bracketCompetitors[0];
+                            isWinner = (bracketCompetitors.cp_wlt.Equals("W"));
+                            if (bracketCompetitors.participant != null)
+                                matchResult.competitor1 = new(bracketCompetitors.participant.organisation.code, bracketCompetitors.participant.organisation.description, bracketCompetitors.cp_result, isWinner);
+                            else matchResult.competitor1 = new("", "轮空", "", false);
+                            //参赛二
+                            bracketCompetitors = c.bracketCompetitors[1];
+                            isWinner = (bracketCompetitors.cp_wlt.Equals("W"));
+                            if (bracketCompetitors.participant != null)
+                                matchResult.competitor2 = new(bracketCompetitors.participant.organisation.code, bracketCompetitors.participant.organisation.description, bracketCompetitors.cp_result, isWinner);
+                            else matchResult.competitor2 = new("", "轮空", "", false);
+                            target.allMatch.Add(matchResult);
+                        }
+
+
                     }
-                    else
-                    {
-                        if(a.bracketCode.Equals("BRN")) target = result.final2;
-                        else target = result.final;        
-                    }
-
-
-                    foreach (var c in b.bracketItems)
-                    {
-                        target.description = c.eventUnit.description;
-                        BattleTableData.BattleResult.MatchResult matchResult = new();
-
-                        bool isWinner;
-                        BattleTable.Bracket.BracketPhases.BracketItems.BracketCompetitors bracketCompetitors;
-                        //参赛一
-                        bracketCompetitors = c.bracketCompetitors[0];
-                        isWinner = (bracketCompetitors.cp_wlt.Equals("W"));
-                        matchResult.competitor1 = new(bracketCompetitors.participant.organisation.code, bracketCompetitors.participant.organisation.description, bracketCompetitors.cp_result, isWinner);
-                        //参赛二
-                        bracketCompetitors = c.bracketCompetitors[1];
-                        isWinner = (bracketCompetitors.cp_wlt.Equals("W"));
-                        matchResult.competitor2 = new(bracketCompetitors.participant.organisation.code, bracketCompetitors.participant.organisation.description, bracketCompetitors.cp_result, isWinner);
-
-                        target.allMatch.Add(matchResult);
-                    }
-
 
                 }
+                File.WriteAllText(savePath, JsonConvert.SerializeObject(result));
+                Console.WriteLine("success");
+                Console.WriteLine(savePath);
+                Console.WriteLine(httpPath);
 
             }
+            catch(Exception e)
+            {
+                Console.WriteLine("false");
+                Console.WriteLine("false");
+                Console.WriteLine("false");
+                Console.WriteLine(savePath);
+                Console.WriteLine(httpPath);
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine();
 
-            File.WriteAllText(savePath, JsonConvert.SerializeObject(result));
+
+            }
+    
 
             return result;
            
         }
-
-        public static bool Communicable(string http)
+        /// <summary>
+        /// 判断是否通信正常，并返回通信结果
+        /// </summary>
+        /// <param name="http"></param>
+        /// <returns></returns>
+        public static (bool,string) Communicable(string http)
         {
-          
+            Console.WriteLine(http);
+
             string jsonData = GetHttpJson(http);
             //Console.WriteLine(http);
             //if (!jsonData[1].Equals('!')) Console.WriteLine(http);
@@ -182,11 +214,17 @@ namespace OlympicSearchServer
             //    Console.WriteLine(http);
             //    Console.WriteLine();
             //}
-            return !jsonData[1].Equals('!');
+            return (!jsonData[1].Equals('!')&&!jsonData[1].Equals('}'), jsonData);
         }
     }
+    
     public class DataGetController : ApiController
     {
+        public class BracketFirstNamePackge
+        {
+            public List<string> allHasBracketMatchFirstName = new();
+        }
+
         public List<NationalMeadls> allNationalMedals = new();
         Dictionary<string, Disciplines> allMatchData = new();
         public List<string> allHasBracketMatchFirstName = new();
@@ -194,13 +232,26 @@ namespace OlympicSearchServer
         {
             allNationalMedals = JsonConvert.DeserializeObject<List<NationalMeadls>>(File.ReadAllText(DataPraser.NationalMedalsPath));
             allMatchData = JsonConvert.DeserializeObject<Dictionary<string, Disciplines>>(File.ReadAllText(DataPraser.MatchNameDataPath));
-            if (allMatchData != null)
+
+            string bracketFirstNamePackgePath = Path.Combine(DataPraser.ResourcesPath, "BracketFirstNamePackge.json");
+            if (File.Exists(bracketFirstNamePackgePath))
             {
-                allHasBracketMatchFirstName = allMatchData.Keys.ToList();
-                //删除所有无对阵表的
-                allHasBracketMatchFirstName.RemoveAll(x => !DataPraser.Communicable(DataPraser.GetBracketTableHttp(allMatchData[x].events[0].id)));
+                allHasBracketMatchFirstName = JsonConvert.DeserializeObject<BracketFirstNamePackge>(File.ReadAllText(bracketFirstNamePackgePath)).allHasBracketMatchFirstName;
             }
-            else Console.WriteLine("数据初始化错误！");
+            else
+            {
+                if (allMatchData != null)
+                {
+                    allHasBracketMatchFirstName = allMatchData.Keys.ToList();
+                    //删除所有无对阵表的
+                    allHasBracketMatchFirstName.RemoveAll(x => !DataPraser.Communicable(DataPraser.GetBracketTableHttp(allMatchData[x].events[0].id)).Item1);
+                    BracketFirstNamePackge save = new BracketFirstNamePackge();
+                    save.allHasBracketMatchFirstName = allHasBracketMatchFirstName;
+                    File.WriteAllText(bracketFirstNamePackgePath, JsonConvert.SerializeObject(save));
+                }
+                else Console.WriteLine("数据初始化错误！");
+            }
+            
             foreach(var a in allHasBracketMatchFirstName)Console.WriteLine(a);
         }
 
@@ -349,6 +400,10 @@ namespace OlympicSearchServer
                 result.code = 0;
                 result.message = $"对阵表通信未成功！大概率是该比赛：{id} 为个人赛不支持对阵表";
             }
+            else
+            {
+                result.data = mid;
+            }
             return result;
         }
 
@@ -376,6 +431,10 @@ namespace OlympicSearchServer
                         this.score = score;
                         this.isWinner = isWinner;
                     }
+                    public void Show()
+                    {
+                        Console.WriteLine($"{countryCN} {score} {isWinner}");
+                    }
                 }
                 public Competitor competitor1, competitor2;
             }
@@ -393,6 +452,38 @@ namespace OlympicSearchServer
         /// </summary>
         public string id;
         public BattleResult final=new(), final2=new(), halfFinal=new(), qFinal=new();
+
+
+
+        public void ShowResult()
+        {
+            Console.WriteLine("=============================Begin===============================");
+            Console.WriteLine($"============================={final.description}===============================");
+            final.allMatch[0].competitor1.Show();
+            final.allMatch[0].competitor2.Show();
+            if (final2.allMatch.Count>0)
+            {
+                Console.WriteLine($"============================={final2.description}===============================");
+                final2.allMatch[0].competitor1.Show();
+                final2.allMatch[0].competitor2.Show();
+            }
+            for (int i = 0; i < halfFinal.allMatch.Count; i++)
+            {
+                Console.WriteLine($"============================={halfFinal.description}  {i + 1}===============================");
+                halfFinal.allMatch[i].competitor1.Show();
+                halfFinal.allMatch[i].competitor2.Show();
+            }
+            for (int i = 0; i < qFinal.allMatch.Count; i++)
+            {
+                Console.WriteLine($"============================={qFinal.description}  {i + 1}===============================");
+                qFinal.allMatch[i].competitor1.Show();
+                qFinal.allMatch[i].competitor2.Show();
+            }
+            Console.WriteLine("(\"============================End===============================");
+
+
+        }
+
     }
 
 
@@ -638,8 +729,10 @@ namespace OlympicSearchServer
                 }
                 public string code;
                 /// <summary>
-                /// 根据这个的数量判断是半决赛，四分之一决赛还是奖牌赛
+                /// 判断比赛类型
                 /// </summary>
+                public string phaseCode;
+                
                 public List<BracketItems> bracketItems;
             }
             public string documentCode;
