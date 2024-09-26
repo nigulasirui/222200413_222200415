@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OlympicSearchServer", "OlympicSearchServer\OlympicSearchServer.csproj", "{03BAA749-38B9-4D9D-A5E5-D4CEF7894F14}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OlympicSearchServer", "OlympicSearchServer\OlympicSearchServer.csproj", "{034D558D-CB22-4ECE-ADB8-5CBB9DF45B61}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{03BAA749-38B9-4D9D-A5E5-D4CEF7894F14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{03BAA749-38B9-4D9D-A5E5-D4CEF7894F14}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{03BAA749-38B9-4D9D-A5E5-D4CEF7894F14}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{03BAA749-38B9-4D9D-A5E5-D4CEF7894F14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{034D558D-CB22-4ECE-ADB8-5CBB9DF45B61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{034D558D-CB22-4ECE-ADB8-5CBB9DF45B61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{034D558D-CB22-4ECE-ADB8-5CBB9DF45B61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{034D558D-CB22-4ECE-ADB8-5CBB9DF45B61}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {572FFB63-9DA7-414B-89DF-DADC51D09115}
+		SolutionGuid = {1E88D4F0-F761-44A6-85EB-F0D86160D7F5}
 	EndGlobalSection
 EndGlobal
