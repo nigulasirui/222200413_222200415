@@ -19,23 +19,23 @@ namespace StudentDB_Scripts
         static void Main(string[] args)
         {
 
-            //// 7595 是端口，可以改成喜欢的
-            //var config = new HttpSelfHostConfiguration("http://localhost:7595");
-            //config.EnableCors();
-            //config.EnableCors(new EnableCorsAttribute("*", "*", "*"));
-            //config.Formatters.XmlFormatter.SupportedMediaTypes.Clear();
+            // 7595 是端口，可以改成喜欢的
+            var config = new HttpSelfHostConfiguration("http://localhost:7595");
+            config.EnableCors();
+            config.EnableCors(new EnableCorsAttribute("*", "*", "*"));
+            config.Formatters.XmlFormatter.SupportedMediaTypes.Clear();
 
-            //// 定义路由，这里不需要改
-            //config.Routes.MapHttpRoute(
-            //    name: "DefaultApi",  // 可以改成喜欢的名字，xxxApi
-            //    routeTemplate: "api/{controller}/{action}",
-            //    defaults: new { id = RouteParameter.Optional }
-            //);
+            // 定义路由，这里不需要改
+            config.Routes.MapHttpRoute(
+                name: "DefaultApi",  // 可以改成喜欢的名字，xxxApi
+                routeTemplate: "api/{controller}/{action}",
+                defaults: new { id = RouteParameter.Optional }
+            );
 
-            //var server = new HttpSelfHostServer(config);
-            //server.OpenAsync().Wait();  // 启动服务器
+            var server = new HttpSelfHostServer(config);
+            server.OpenAsync().Wait();  // 启动服务器
 
-            //Console.WriteLine("服务器已启动，按回车停止。");
+            Console.WriteLine("服务器已启动，按回车停止。");
 
             //Console.ReadLine();
 
@@ -44,22 +44,22 @@ namespace StudentDB_Scripts
             //mid.ReadAllMatchData();
             //mid.ReadAllNationalMedalDetails();
             ///测试获取http上的json数据
-            DataGetController test = new();
+            //DataGetController test = new();
 
 
 
-            List<string> firstName = test.GetAllMatchName().data;
+            //List<string> firstName = test.GetAllMatchName().data;
 
-            foreach (var a in firstName)
-            {
-                Console.WriteLine(a);
-                List<MatchDetailName> detailName = test.GetAllMatchDetailName(a).data;
-                foreach (var b in detailName)
-                {
-                    Console.WriteLine($"{b.id}   {b.description}");
-                    test.GetBattleTable(b.id).data.ShowResult();
-                }
-            }
+            //foreach (var a in firstName)
+            //{
+            //    Console.WriteLine(a);
+            //    List<MatchDetailName> detailName = test.GetAllMatchDetailName(a).data;
+            //    foreach (var b in detailName)
+            //    {
+            //        Console.WriteLine($"{b.id}   {b.description}");
+            //        test.GetBattleTable(b.id).data.ShowResult();
+            //    }
+            //}
 
             //List<MatchDetailName> detailName = test.GetAllMatchDetailName(firstName[1]).data;
             //foreach (var b in detailName)
@@ -81,6 +81,8 @@ namespace StudentDB_Scripts
 
             //var mid = DataPraser.Communicable("https://olympics.com/OG2024/data/GLO_Bracket~comp=OG2024~rsc=SHOMARM---------------------------~lang=CHI.json");
             //Console.WriteLine($"{mid.Item1}   {mid.Item2}");
+
+            Console.ReadLine();
         }
 
     }

@@ -17,9 +17,9 @@ namespace OlympicSearchServer
     {
         //服务器使用
         //C:\Users\Administrator\Documents\GitHub\222200413_222200415\后端\OlympicSearchServer\Resources
-        public static string CrawlerDataPath = "C:\\Users\\Administrator\\Documents\\GitHub\\222200413_222200415\\后端\\OlympicSearchServer\\Resources\\crawlerData.json";
-        public static string MatchNameDataPath = "C:\\Users\\Administrator\\Documents\\GitHub\\222200413_222200415\\后端\\OlympicSearchServer\\Resources\\matchNameData.json";
-        public static string NationalMedalsPath = "C:\\Users\\Administrator\\Documents\\GitHub\\222200413_222200415\\后端\\OlympicSearchServer\\Resources\\nationalMedals.json";
+        public static string CrawlerDataPath = "C:\\Users\\Administrator\\Documents\\GitHub\\222200413_222200415\\后端\\OlympicSearchServer\\Resources\\CrawlerData\\crawlerData.json";
+        public static string MatchNameDataPath = "C:\\Users\\Administrator\\Documents\\GitHub\\222200413_222200415\\后端\\OlympicSearchServer\\Resources\\CrawlerData\\matchNameData.json";
+        public static string NationalMedalsPath = "C:\\Users\\Administrator\\Documents\\GitHub\\222200413_222200415\\后端\\OlympicSearchServer\\Resources\\CrawlerData\\nationalMedals.json";
 
         //public static string TestDayResultPath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/testDayResult.json";
 
@@ -46,7 +46,7 @@ namespace OlympicSearchServer
         {
             return $"https://sph-s-api.olympics.com/summer/schedules/api/CHI/schedule/day/{date}";
         }
-        public void ReadAllMatchData()
+        public static void ReadAllMatchData()
         {
             MatchNameData data = JsonConvert.DeserializeObject<MatchNameData>(File.ReadAllText(CrawlerDataPath));
             Dictionary<string, Disciplines> allMatchData = new();
@@ -56,7 +56,7 @@ namespace OlympicSearchServer
             }
             File.WriteAllText(MatchNameDataPath, JsonConvert.SerializeObject(allMatchData));
         }
-        public void ReadAllNationalMedalDetails()
+        public static void ReadAllNationalMedalDetails()
         {
             NationalMedalDetails data = JsonConvert.DeserializeObject<NationalMedalDetails>(File.ReadAllText(CrawlerDataPath));
             List<NationalMeadls> allNationalData = new();
@@ -244,6 +244,8 @@ namespace OlympicSearchServer
         public List<string> allHasBracketMatchFirstName = new();
         public DataGetController()
         {
+            if (!File.Exists(DataPraser.MatchNameDataPath)) DataPraser.ReadAllMatchData();
+            if (!File.Exists(DataPraser.NationalMedalsPath)) DataPraser.ReadAllNationalMedalDetails();
             allNationalMedals = JsonConvert.DeserializeObject<List<NationalMeadls>>(File.ReadAllText(DataPraser.NationalMedalsPath));
             allMatchData = JsonConvert.DeserializeObject<Dictionary<string, Disciplines>>(File.ReadAllText(DataPraser.MatchNameDataPath));
 
