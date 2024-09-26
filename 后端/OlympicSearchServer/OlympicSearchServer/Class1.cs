@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Net;
 using System.Text;
 using System.Web.Http;
@@ -17,28 +18,13 @@ namespace OlympicSearchServer
     /// </summary>
     public class DataPraser
     {
-        //服务器使用
-        //C:\Users\Administrator\Documents\GitHub\222200413_222200415\后端\OlympicSearchServer\Resources
-        public static string CrawlerDataPath = "C:\\Users\\Administrator\\Documents\\GitHub\\222200413_222200415\\后端\\OlympicSearchServer\\Resources\\CrawlerData\\crawlerData.json";
-        public static string MatchNameDataPath = "C:\\Users\\Administrator\\Documents\\GitHub\\222200413_222200415\\后端\\OlympicSearchServer\\Resources\\CrawlerData\\matchNameData.json";
-        public static string NationalMedalsPath = "C:\\Users\\Administrator\\Documents\\GitHub\\222200413_222200415\\后端\\OlympicSearchServer\\Resources\\CrawlerData\\nationalMedals.json";
+        public static string CrawlerDataPath = "Resources\\CrawlerData\\crawlerData.json";
+        public static string MatchNameDataPath = "Resources\\CrawlerData\\matchNameData.json";
+        public static string NationalMedalsPath = "Resources\\CrawlerData\\nationalMedals.json";
 
-        //public static string TestDayResultPath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/testDayResult.json";
+        public static string ResourcesPath = "Resources";
+        public static string DayResultSavePath = "Resources\\DayResult";
 
-        public static string ResourcesPath = "C:\\Users\\Administrator\\Documents\\GitHub\\222200413_222200415\\后端\\OlympicSearchServer\\Resources";
-        public static string DayResultSavePath = "C:\\Users\\Administrator\\Documents\\GitHub\\222200413_222200415\\后端\\OlympicSearchServer\\Resources\\DayResult";
-
-
-
-        //调试使用
-        //public static string CrawlerDataPath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/crawlerData.json";
-        //public static string MatchNameDataPath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/matchNameData.json";
-        //public static string NationalMedalsPath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/nationalMedals.json";
-
-        //public static string TestDayResultPath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/testDayResult.json";
-
-        //public static string ResourcesPath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/OlympicSearchServer/Resources";
-        //public static string DayResultSavePath = "C:/Users/nigulasirui/Desktop/软工实践作业/222200415/第四次作业/OlympicSearchServer/Resources/DayResult";
 
         public static string GetBracketTableHttp(string matchID)
         {
@@ -278,9 +264,9 @@ namespace OlympicSearchServer
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public Result<List<string>> GetAllMatchName()
+        public GetResult<List<string>> GetAllMatchName()
         {
-            Result<List<string>> result = new Result<List<string>>();
+            GetResult<List<string>> result = new GetResult<List<string>>();
             if (allHasBracketMatchFirstName.Count == 0)
             {
                 result.code = 0;
@@ -296,9 +282,9 @@ namespace OlympicSearchServer
         /// <param name="firstName"></param>
         /// <returns></returns>
         [HttpGet]
-        public Result<List<MatchDetailName>> GetAllMatchDetailName(string firstName)
+        public GetResult<List<MatchDetailName>> GetAllMatchDetailName(string firstName)
         {
-            Result<List<MatchDetailName>> result = new Result<List<MatchDetailName>>();
+            GetResult<List<MatchDetailName>> result = new GetResult<List<MatchDetailName>>();
             if (allMatchData.ContainsKey(firstName))
             {
                 result.data = allMatchData[firstName].events.Select(x => new MatchDetailName() { id = x.id, description = x.name }).ToList();
@@ -316,9 +302,9 @@ namespace OlympicSearchServer
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public Result<List<NationalMeadls>> GetAllNationalMedals()
+        public GetResult<List<NationalMeadls>> GetAllNationalMedals()
         {
-            Result<List<NationalMeadls>> result = new Result<List<NationalMeadls>>();
+            GetResult<List<NationalMeadls>> result = new GetResult<List<NationalMeadls>>();
             if (allNationalMedals.Count == 0)
             {
                 result.code = 0;
@@ -342,13 +328,27 @@ namespace OlympicSearchServer
             public string id;
             public string description;
         }
-        Dictionary<string, Result<List<Units>>> saveDayResult = new Dictionary<string, Result<List<Units>>>();
+        Dictionary<string, GetResult<List<Units>>> saveDayResult = new Dictionary<string, GetResult<List<Units>>>();
         List<StringIntPair> useCheck = new List<StringIntPair>();
         [HttpGet]
-        public Result<List<Units>> GetDayResult(string Date)
+        public GetResult<List<Units>> GetDayResult(string Date)
         {
+            
+            GetResult <List<Units>> result = new GetResult<List<Units>>();
+
+            string[] strings = Date.Split('-');
+            int month= int.Parse(strings[1]), day= int.Parse(strings[2]);
+      
+            if (string.IsNullOrEmpty(Date) || strings.Length != 3 || !strings[0].Equals("2024") || month < 7|| month>8||(month==7&& (day <24|| day >31))||(month==8&&(day<1||day>11)))
+            {
+                result.code = 0;
+                result.message = "日期错误！";
+                Console.WriteLine($"参数  {Date} 的数据获取错误!");
+                return result;
+            }
+
             string savePath = Path.Combine(DataPraser.DayResultSavePath, Date + ".json");
-            Result<List<Units>> result = new Result<List<Units>>();
+            
             DateMatchDetails data;
             if (saveDayResult.ContainsKey(Date))
             {
@@ -364,12 +364,20 @@ namespace OlympicSearchServer
                 else
                 {
                     string httpPath = DataPraser.GetDailyFixturesHttp(Date);
-                    string jsonData = DataPraser.GetHttpJson(httpPath);
-                    data = JsonConvert.DeserializeObject<DateMatchDetails>(jsonData);
+                    var jsonResult = DataPraser.Communicable(httpPath);
+                    //if (!jsonResult.Item1)
+                    //{
+                    //    result.code = 0;
+                    //    result.message = "日期错误！";
+                    //    Console.WriteLine($"参数  {Date} 的数据获取错误!");
+                    //    return result;
+                    //}
+                    data = JsonConvert.DeserializeObject<DateMatchDetails>(jsonResult.Item2);
 
                     foreach (var a in data.units)
                     {
                         a.startDate = a.startDate.Substring(11, 5);
+                        if (a.competitors == null) continue;
                         if (a.competitors.Count > 3)
                         {
                             a.competitors.RemoveRange(3, a.competitors.Count - 3);
@@ -409,9 +417,9 @@ namespace OlympicSearchServer
         //    File.WriteAllText(Path.Combine(DataPraser.ResourcesPath,"TestBracket.json"), JsonConvert.SerializeObject(data,Formatting.Indented));
         //}
         [HttpGet]
-        public Result<BattleTableData> GetBattleTable(string id)
+        public GetResult<BattleTableData> GetBattleTable(string id)
         {
-            Result<BattleTableData> result = new Result<BattleTableData>();
+            GetResult<BattleTableData> result = new GetResult<BattleTableData>();
             BattleTableData mid = DataPraser.GetBattleTable(id);
             if (mid == null)
             {
@@ -520,7 +528,7 @@ namespace OlympicSearchServer
         public int rank;
         public int gold, silver, bronze, total;
     }
-    public class Result<T>
+    public class GetResult<T>
     {
         /// <summary>
         /// 1成功，0失败
