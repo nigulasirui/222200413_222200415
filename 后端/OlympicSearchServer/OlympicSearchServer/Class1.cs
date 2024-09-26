@@ -241,10 +241,10 @@ namespace OlympicSearchServer
             public List<string> allHasBracketMatchFirstName = new List<string>();
         }
 
-        public List<NationalMeadls> allNationalMedals = new List<NationalMeadls>();
-        Dictionary<string, Disciplines> allMatchData = new Dictionary<string, Disciplines>();
-        public List<string> allHasBracketMatchFirstName = new List<string>();
-        public DataGetController()
+        public static List<NationalMeadls> allNationalMedals = new List<NationalMeadls>();
+        static Dictionary<string, Disciplines> allMatchData = new Dictionary<string, Disciplines>();
+        public static List<string> allHasBracketMatchFirstName = new List<string>();
+        static DataGetController()
         {
             if (!File.Exists(DataPraser.MatchNameDataPath)) DataPraser.ReadAllMatchData();
             if (!File.Exists(DataPraser.NationalMedalsPath)) DataPraser.ReadAllNationalMedalDetails();
