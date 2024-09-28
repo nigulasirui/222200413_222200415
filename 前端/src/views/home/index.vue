@@ -2,7 +2,7 @@
 <!--  轮播图-->
   <div class="carousel">
     <el-carousel :interval="3000" height="auto">
-      <el-carousel-item v-for="(item, index) in swiperImages" :key="index" style=" height: 450px; !important;">
+      <el-carousel-item v-for="(item, index) in swiperImages" :key="index" style=" height: 500px; !important;">
         <img :src="item" alt="" class="carousel-image"/>
       </el-carousel-item>
     </el-carousel>
@@ -48,6 +48,15 @@
             <div class="item">{{item.total}}</div>
           </div>
         </div>
+        <el-button
+          class="all-btn"
+          @click="Go('/rankings')"
+        >
+          <div>
+            <p>查看全部</p>
+            <img src="@/assets/rankingImg/all-arrow.png" alt="">
+          </div>
+        </el-button>
       </div>
 
     </el-container>
@@ -56,6 +65,8 @@
 </template>
 
 <script setup lang="ts">
+import router from '@/router'
+
 import swiper1 from '@/assets/img/carousel_img1.png';
 import swiper2 from '@/assets/img/carousel_img2.png';
 import swiper3 from '@/assets/img/carousel_img3.png';
@@ -67,6 +78,7 @@ import gold from '@/assets/rankingImg/gold.png'
 import silver from '@/assets/rankingImg/silver.png'
 import bronze from '@/assets/rankingImg/bronze.png'
 import total from '@/assets/rankingImg/total.png'
+
 const medalImage = [ gold,silver,bronze,total ];
 
 const data=[
@@ -82,7 +94,7 @@ const data=[
   {
     organisation: "USA",
     description: "美国",
-    rank: 1,
+    rank: 2,
     gold: 40,
     silver: 44,
     bronze: 42,
@@ -90,6 +102,9 @@ const data=[
   }
 ]
 
+function Go(path: string): void {
+  router.push(path)
+}
 // import axios from '@/plugins/axios';
 // import { ref, onMounted } from 'vue';
 //
@@ -190,5 +205,31 @@ const data=[
 .item{
   height: 35px;
   margin: 0 3vw;
+}
+
+.all-btn{
+  height: 50px;
+  width: 100px;
+  box-sizing: border-box;
+  display: flex;
+  float: right;
+  justify-content: space-between;
+  margin: 50px 10% 50px 0;
+  color:black;
+  font-weight: bold;
+  border: black solid 2px;
+  div{
+    display: flex;
+    align-items: center;
+  }
+  img{
+    height: 50px;
+    margin-left: 5px;
+  }
+}
+
+.all-btn:hover{
+  background-color: black;
+  color: white;
 }
 </style>

@@ -7,7 +7,8 @@ import navigation from './components/navigation.vue';
     <el-header>
       <navigation />
     </el-header>
-    <RouterView />
+
+    <RouterView style="margin-top: 6vh"/>
 <!--    <el-main>-->
 <!--      <RouterView />-->
 <!--    </el-main>-->
