@@ -43,6 +43,7 @@ import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useDayResultStore } from '@/stores/dayResult'
 
+const dayResult = useDayResultStore()
 const route = useRoute()
 function Go(path: string): void {
   router.push(path)
@@ -65,21 +66,20 @@ watch(
   { immediate: true } // 初始加载时也会调用
 )
 
-const dateValue = ref(new Date('2024-07-24'))
+const dateValue = ref(new Date(dayResult.date))
 const disabledDate = (time:Date) => {
   const start = new Date('2024-07-23').getTime()
   const end = new Date('2024-08-12').getTime()
   return time.getTime() < start || time.getTime() > end
 }
 
-const dayResult = useDayResultStore()
 const handleDateChange = () => {
   // 更新store  date
-  dayResult.date=dateValue.value.getFullYear() + '-' + dateValue.value.toLocaleDateString('en-US', {
+  dayResult.date = dateValue.value.getFullYear() + '-' + dateValue.value.toLocaleDateString('en-US', {
     month: '2-digit',
     day: '2-digit'
   }).replace(',', '').replace('/', '-')
-  console.log(dayResult.date)
+  localStorage.setItem('date', dayResult.date)
   //获取新日期赛程
   dayResult.fetchDayResults(dayResult.date)
 }

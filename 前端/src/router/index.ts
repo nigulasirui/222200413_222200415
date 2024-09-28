@@ -23,8 +23,8 @@ const router = createRouter({
       name: 'DayResult',
       component: ()=>import('@/views/dayResult/index.vue'),
       beforeEnter: async (to, from, next) => {
-        const dayResult = useDayResultStore()
-        await dayResult.fetchDayResults(dayResult.date)
+        const dayResultStore = useDayResultStore()
+        await dayResultStore.fetchDayResults(dayResultStore.date)
         next()
       }
     },
