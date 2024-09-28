@@ -224,7 +224,7 @@ namespace OlympicSearchServer
 
             string http = DataPraser.GetSchedulesHttp(disciplineCode);
             var jsonResult = DataPraser.Communicable(http);
-            if (!jsonResult.Item1)
+            if (!jsonResult.Item1|| !eventId.Substring(0,3).Equals(disciplineCode))
             {
                 Console.WriteLine($"{http}   数据获取错误");
                 return null;
@@ -253,7 +253,11 @@ namespace OlympicSearchServer
                 GetResultClass mid = JsonConvert.DeserializeObject<GetResultClass>(jsonResult_mid.Item2);
 
                 if (!mid.results.schedule.status.code.Equals("FINISHED")) continue;
-                if (mid.results.items.Count > 2)return null;
+                if (mid.results.items.Count > 2)
+                {
+                    Console.WriteLine($"{http}   该项目数据结构不支持期望");
+                    return null;
+                }
 
 
                 ResultCombine target = allResults.Find(x => x.stateName.Equals(mid.results.eventUnit.shortDescription));
