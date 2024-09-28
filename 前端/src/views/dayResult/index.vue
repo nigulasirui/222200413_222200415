@@ -84,6 +84,7 @@ const dayResultStore = useDayResultStore()
   margin-bottom: 3vh;
   h1{
     margin-left: 3vw;
+    font-size: 3vh;
   }
 }
 

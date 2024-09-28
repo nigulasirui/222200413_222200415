@@ -3,8 +3,8 @@ import { defineStore } from 'pinia';
 import axios from '@/plugins/axios';
 
 export const useMedalStore = defineStore('medal', () => {
-  const storedMedals = localStorage.getItem('medals');
-  const medals = ref(storedMedals ? JSON.parse(storedMedals) : []);
+  const storeMedals = localStorage.getItem('medals');
+  const medals = ref(storeMedals ? JSON.parse(storeMedals) : []);
   //获取奖牌榜信息
   const fetchMedals = async () => {
     try {
