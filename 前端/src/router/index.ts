@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useDayResultStore } from '@/stores/dayResult'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,7 +21,12 @@ const router = createRouter({
     {
       path: '/dayResult',
       name: 'DayResult',
-      component: ()=>import('@/views/dayResult/index.vue')
+      component: ()=>import('@/views/dayResult/index.vue'),
+      beforeEnter: async (to, from, next) => {
+        const dayResult = useDayResultStore()
+        await dayResult.fetchDayResults(dayResult.date)
+        next()
+      }
     },
     {
       path: '/compete',

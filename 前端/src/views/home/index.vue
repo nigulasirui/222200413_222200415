@@ -90,13 +90,15 @@ interface Medal {
   bronze: number;
   total: number;
 }
+
 const data = ref<Medal[]>([]);
 const medalStore = useMedalStore();
 
 onMounted(async () => {
-  await medalStore.getMedals()
+  await medalStore.fetchMedals()
   // data.value = medalStore.medals
   data.value = medalStore.medals.slice(0, 7);
+  console.log('home');
 })
 
 function Go(path: string): void {

@@ -65,9 +65,10 @@ const data = ref<Medal[]>([]);
 const medalStore = useMedalStore();
 
 onMounted(async () => {
-  await medalStore.getMedals()
+  await medalStore.fetchMedals()
   data.value = medalStore.medals
 })
+
 </script>
 
 <style scoped>
