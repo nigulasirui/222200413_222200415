@@ -19,6 +19,9 @@ namespace StudentDB_Scripts
         static void Main(string[] args)
         {
 
+            
+
+
             // 7595 是端口，可以改成喜欢的
             var config = new HttpSelfHostConfiguration("http://localhost:7595");
             config.EnableCors();
@@ -37,14 +40,17 @@ namespace StudentDB_Scripts
 
             Console.WriteLine("服务器已启动，按回车停止。");
 
-            //Console.ReadLine();
+            Console.ReadLine();
+
+            
+            
 
 
             //DataPraser mid=new DataPraser();
             //mid.ReadAllMatchData();
             //mid.ReadAllNationalMedalDetails();
             ///测试获取http上的json数据
-            //DataGetController test = new();
+            //DataGetController test = new DataGetController();
 
 
 
@@ -56,8 +62,8 @@ namespace StudentDB_Scripts
             //    List<MatchDetailName> detailName = test.GetAllMatchDetailName(a).data;
             //    foreach (var b in detailName)
             //    {
-            //        Console.WriteLine($"{b.id}   {b.description}");
-            //        test.GetBattleTable(b.id).data.ShowResult();
+            //        Console.WriteLine($"{b.id.Substring(0,3)}   {b.id}");
+            //        test.GetResultCombine(b.id.Substring(0, 3), b.id);
             //    }
             //}
 
@@ -82,7 +88,7 @@ namespace StudentDB_Scripts
             //var mid = DataPraser.Communicable("https://olympics.com/OG2024/data/GLO_Bracket~comp=OG2024~rsc=SHOMARM---------------------------~lang=CHI.json");
             //Console.WriteLine($"{mid.Item1}   {mid.Item2}");
 
-            Console.ReadLine();
+            //Console.ReadLine();
         }
 
     }

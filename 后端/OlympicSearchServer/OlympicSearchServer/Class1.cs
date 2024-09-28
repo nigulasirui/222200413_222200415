@@ -7,9 +7,12 @@ using System.Media;
 using System.Net;
 using System.Text;
 using System.Web.Http;
+using static OlympicSearchServer.BattleTableData.BattleResult;
+using static OlympicSearchServer.BattleTableData.BattleResult.MatchResult;
 using static OlympicSearchServer.DateMatchDetails;
 using static OlympicSearchServer.DateMatchDetails.Units.Competitors;
 using static OlympicSearchServer.MatchNameData.Props.PageProps.InitialFilterDisciplines;
+using static OlympicSearchServer.ResultCombine;
 
 namespace OlympicSearchServer
 {
@@ -33,6 +36,14 @@ namespace OlympicSearchServer
         public static string GetDailyFixturesHttp(string date)
         {
             return $"https://sph-s-api.olympics.com/summer/schedules/api/CHI/schedule/day/{date}";
+        }
+        public static string GetSchedulesHttp(string disciplineCode)
+        {
+            return $"https://olympics.com/OG2024/data/SCH_StartList~comp=OG2024~disc={disciplineCode}~lang=CHI.json";
+        }
+        public static string GetScheduleResultsHttp(string disciplineCode, string id)
+        {
+            return $"https://olympics.com/OG2024/data/RES_ByRSC_H2H~comp=OG2024~disc={disciplineCode}~rscResult={id}~lang=CHI.json";
         }
         public static void ReadAllMatchData()
         {
@@ -159,13 +170,13 @@ namespace OlympicSearchServer
                             bracketCompetitors = c.bracketCompetitors[0];
                             isWinner = (bracketCompetitors.cp_wlt.Equals("W"));
                             if (bracketCompetitors.participant != null)
-                                matchResult.competitor1 = new BattleTableData.BattleResult.MatchResult.Competitor(bracketCompetitors.participant.organisation.code, bracketCompetitors.participant.organisation.description, bracketCompetitors.cp_result, isWinner);
+                                matchResult.competitor1 = new BattleTableData.BattleResult.MatchResult.Competitor(bracketCompetitors.participant.organisation.code, bracketCompetitors.participant.shortName, bracketCompetitors.cp_result, isWinner);
                             else matchResult.competitor1 = new BattleTableData.BattleResult.MatchResult.Competitor("", "轮空", "", false);
                             //参赛二
                             bracketCompetitors = c.bracketCompetitors[1];
                             isWinner = (bracketCompetitors.cp_wlt.Equals("W"));
                             if (bracketCompetitors.participant != null)
-                                matchResult.competitor2 = new BattleTableData.BattleResult.MatchResult.Competitor(bracketCompetitors.participant.organisation.code, bracketCompetitors.participant.organisation.description, bracketCompetitors.cp_result, isWinner);
+                                matchResult.competitor2 = new BattleTableData.BattleResult.MatchResult.Competitor(bracketCompetitors.participant.organisation.code, bracketCompetitors.participant.shortName, bracketCompetitors.cp_result, isWinner);
                             else matchResult.competitor2 = new BattleTableData.BattleResult.MatchResult.Competitor("", "轮空", "", false);
                             target.allMatch.Add(matchResult);
                         }
@@ -198,6 +209,83 @@ namespace OlympicSearchServer
             return result;
 
         }
+
+
+        public static ResultCombineJsonUse GetResultCombine(string disciplineCode, string eventId)
+        {
+            string savePath = Path.Combine(ResourcesPath, "ResultCombine", eventId.Substring(0,11)+".json");
+            if (File.Exists(savePath))
+            {
+                string json=File.ReadAllText(savePath);
+                ResultCombineJsonUse result = JsonConvert.DeserializeObject<ResultCombineJsonUse>(json);
+                return result;
+
+            }
+
+            string http = DataPraser.GetSchedulesHttp(disciplineCode);
+            var jsonResult = DataPraser.Communicable(http);
+            if (!jsonResult.Item1)
+            {
+                Console.WriteLine($"{http}   数据获取错误");
+                return null;
+            }
+            GetSchelusClass getSchelusClass;
+            getSchelusClass = JsonConvert.DeserializeObject<GetSchelusClass>(jsonResult.Item2);
+            eventId = eventId.Substring(0, 11);
+            getSchelusClass.schedules.RemoveAll(x => !x.code.Contains(eventId)||!x.status.code.Equals("FINISHED"));
+
+            List<ResultCombine> allResults = new List<ResultCombine>();
+            foreach (var a in getSchelusClass.schedules)
+            {
+                string resultHttp = DataPraser.GetScheduleResultsHttp(disciplineCode, a.code);
+                var jsonResult_mid = DataPraser.Communicable(resultHttp);
+                if (!jsonResult_mid.Item1)
+                {
+                    Console.WriteLine("");
+                    Console.WriteLine("");
+                    Console.WriteLine("");
+                    Console.WriteLine(resultHttp);
+                    Console.WriteLine("");
+                    Console.WriteLine("");
+                    Console.WriteLine("");
+                    continue;
+                }
+                GetResultClass mid = JsonConvert.DeserializeObject<GetResultClass>(jsonResult_mid.Item2);
+
+                if (!mid.results.schedule.status.code.Equals("FINISHED")) continue;
+                if (mid.results.items.Count > 2)return null;
+
+
+                ResultCombine target = allResults.Find(x => x.stateName.Equals(mid.results.eventUnit.shortDescription));
+                if (target == null || target.Equals(default(ResultCombine)))
+                {
+                    target = new ResultCombine() { stateName = mid.results.eventUnit.shortDescription };
+                    allResults.Add(target);
+                }
+                NewMatchResult matchResult = new NewMatchResult();
+                GetResultClass.Result.Item item;  
+                item = mid.results.items[0];
+                matchResult.competitor1 = new MatchResult.Competitor(item.participant.organisation.code, item.participant.shortName, item.resultData, !string.IsNullOrEmpty(item.resultWLT) &&item.resultWLT.Equals("W"));
+                item = mid.results.items[1];
+                matchResult.competitor2 = new MatchResult.Competitor(item.participant.organisation.code, item.participant.shortName, item.resultData, !string.IsNullOrEmpty(item.resultWLT) && item.resultWLT.Equals("W"));
+                matchResult.startDate = mid.results.schedule.startDate.Substring(0,16);
+                target.results.Add(matchResult);
+            }
+            //排序 需要修改，当前方法排序不对
+            allResults.Sort((x, y) => x.results.Count.CompareTo(y.results.Count));
+            foreach (var a in allResults)
+            {
+                a.results.Sort((x, y) => x.startDate.CompareTo(y.startDate));
+            }
+            ResultCombineJsonUse resultCombineJsonUse = new ResultCombineJsonUse();
+            resultCombineJsonUse.resultCombines = allResults;
+            File.WriteAllText(savePath, JsonConvert.SerializeObject(resultCombineJsonUse));
+            return resultCombineJsonUse;
+
+        }
+
+
+
         /// <summary>
         /// 判断是否通信正常，并返回通信结果
         /// </summary>
@@ -433,6 +521,24 @@ namespace OlympicSearchServer
             return result;
         }
 
+
+        [HttpGet]
+        public GetResult<List<ResultCombine>> GetResultCombine(string disciplineCode, string eventId)
+        {
+            GetResult<List<ResultCombine>> result = new GetResult<List<ResultCombine>>();
+            ResultCombineJsonUse resultCombineJsonUse = DataPraser.GetResultCombine(disciplineCode, eventId);
+            if (resultCombineJsonUse == null)
+            {
+                result.code = 0;
+                result.message = "获取数据失败,或该项目数据结构不支持期望";
+                return result;
+            }
+            result.data = resultCombineJsonUse.resultCombines;
+            return result;
+
+        }
+
+
     }
     [Serializable]
     public class BattleTableData
@@ -447,19 +553,19 @@ namespace OlympicSearchServer
                 public class Competitor
                 {
                     public string countryEN;
-                    public string countryCN;
+                    public string name;
                     public string score;
                     public bool isWinner;
-                    public Competitor(string countryEN, string countryCN, string score, bool isWinner)
+                    public Competitor(string countryEN, string name, string score, bool isWinner)
                     {
                         this.countryEN = countryEN;
-                        this.countryCN = countryCN;
+                        this.name = name;
                         this.score = score;
                         this.isWinner = isWinner;
                     }
                     public void Show()
                     {
-                        Console.WriteLine($"{countryCN} {score} {isWinner}");
+                        Console.WriteLine($"{name} {score} {isWinner}");
                     }
                 }
                 public Competitor competitor1, competitor2;
@@ -663,6 +769,7 @@ namespace OlympicSearchServer
             public string eventUnitName;
             public string id;
             public string disciplineCode;
+            public string eventId;
             public string startDate;
             public List<Competitors> competitors;
             [Serializable]
@@ -729,6 +836,7 @@ namespace OlympicSearchServer
                                 public string description;
                             }
                             public string __typename;
+                            public string shortName;
                             public List<Athlete> athletes;
                             /// <summary>
                             /// 获取参赛队伍或人员国籍数据
@@ -772,7 +880,96 @@ namespace OlympicSearchServer
         public List<Bracket> bracket;
 
     }
+    [Serializable]
+    public class GetSchelusClass
+    {
+        [Serializable]
+        public class Schedules
+        {
+            //用来确定比赛类型，比赛阶段
+            public string code;
+            public GetResultClass.Result.Schedule.Status status;
+        }  
+        public List<Schedules> schedules = new List<Schedules>();
 
+    }
+
+    /// <summary>
+    /// 获取比分
+    /// </summary>
+    [Serializable]
+    public class GetResultClass
+    {
+        [Serializable]
+        public class Result
+        {
+            [Serializable]
+            public class EventUnit
+            {
+                public string shortDescription;
+            }
+            [Serializable]
+            public class Schedule
+            {
+                [Serializable]
+                public class Status
+                {
+                    public string code;
+                }
+
+                public string startDate;
+                public Status status;
+            }
+            [Serializable]
+            public class Item
+            {
+                [Serializable]
+                public class Organisation
+                {
+                    /// <summary>
+                    /// 国家英文官方缩写
+                    /// </summary>
+                    public string code;
+                    public string description;
+                }
+                [Serializable]
+                public class Participant
+                {
+                    public string shortName;
+                    public Organisation organisation;
+                }
+                public string resultWLT;
+                public string resultData;
+                public Participant participant;
+            }
+            
+            
+            public EventUnit eventUnit;
+            public Schedule schedule;
+            public List<Item> items = new List<Item>();
+        }
+        public Result results=new Result();
+
+
+    }
+    [Serializable]
+    public class ResultCombineJsonUse
+    {
+        public List<ResultCombine> resultCombines = new List<ResultCombine>();
+    }
+    [Serializable]
+    public class ResultCombine
+    {
+        [Serializable]
+        public class NewMatchResult
+        {
+            public string startDate;
+            public Competitor competitor1, competitor2;
+        }
+        public string stateName;
+        public List<NewMatchResult> results = new List<NewMatchResult>();
+
+    }
 
 
 }
