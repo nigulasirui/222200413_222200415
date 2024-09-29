@@ -24,26 +24,63 @@
       round
       @click="Go('/compete')"
     >对阵表</el-button>
-    <el-date-picker
-      v-if="route.path === '/dayResult'"
-      v-model="dateValue"
-      type="date"
-      placeholder="选择日期"
-      :editable="false"
-      :disabled-date="disabledDate"
-      @change="handleDateChange"
-      class="date-picker"
-    />
+    <div class="select">
+      <el-date-picker
+        v-if="route.path === '/dayResult'"
+        v-model="dateValue"
+        type="date"
+        placeholder="选择日期"
+        :editable="false"
+        :disabled-date="disabledDate"
+        @change="handleDateChange"
+        class="date-picker"
+      />
+      <div
+        v-if="route.path === '/compete'"
+      >
+        <el-dropdown>
+          <el-button type="primary" round style="margin-right: 10px">
+            {{ competeStore.selected.firstname }}<el-icon class="el-icon--right"><arrow-down /></el-icon>
+          </el-button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item
+                v-for="(item,index) in competeStore.projects"
+                :key="index"
+                @click="handleProjectChange(item)"
+              >{{ item }}</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+        <el-dropdown>
+          <el-button type="primary" round>
+            {{ competeStore.selected.type.description }}<el-icon class="el-icon--right"><arrow-down /></el-icon>
+          </el-button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item
+                v-for="(item,index) in competeStore.types"
+                :key="index"
+                @click="handleTypeChange(item)"
+              >{{ item.description }}</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ArrowDown } from '@element-plus/icons-vue'
 import router from '@/router'
 import { ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useDayResultStore } from '@/stores/dayResult'
+import { useCompetitionStore } from '@/stores/competition'
 
 const dayResult = useDayResultStore()
+const competeStore = useCompetitionStore()
 const route = useRoute()
 function Go(path: string): void {
   router.push(path)
@@ -83,6 +120,25 @@ const handleDateChange = () => {
   //获取新日期赛程
   dayResult.fetchDayResults(dayResult.date)
 }
+
+const handleProjectChange=async (item: string) => {
+  competeStore.selected.firstname = item
+  //update types
+  await competeStore.fetchTypes(competeStore.selected.firstname)
+  competeStore.selected.type=competeStore.types[0]
+  //update info (默认type)
+
+}
+
+interface Type {
+  id:string,
+  description:string
+}
+const handleTypeChange=async (item: Type) => {
+  competeStore.selected.type = item
+  //update info (默认type)
+  await competeStore.fetchInfo(competeStore.selected.type.id)
+}
 </script>
 
 <style scoped>
@@ -98,7 +154,7 @@ const handleDateChange = () => {
   z-index: 1000;
 }
 
-.navigation.has-date-picker > *:last-child {
+.select{
   margin-left: auto;
 }
 

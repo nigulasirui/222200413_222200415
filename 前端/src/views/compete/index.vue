@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div>
-      
+
     </div>
     <div class="header">
       <h1>1/4决赛</h1>
@@ -9,7 +9,9 @@
       <h1>决赛</h1>
     </div>
     <div class="content">
-      <div class="col"></div>
+      <div class="col">
+
+      </div>
       <div class="col"></div>
       <div class="col"></div>
     </div>
@@ -17,7 +19,18 @@
 </template>
 
 <script setup lang="ts">
+import { useCompetitionStore } from '@/stores/competition'
+import { onMounted } from 'vue'
 
+const competitionStore = useCompetitionStore()
+
+onMounted(async () => {
+  await competitionStore.fetchProject()
+  await competitionStore.fetchTypes(competitionStore.selected.firstname)
+  await competitionStore.fetchInfo(competitionStore.selected.type.id)
+  console.log('competitionStore.projects',competitionStore.projects)
+  console.log('competitionStore.types',competitionStore.types)
+})
 </script>
 
 <style scoped>
