@@ -37,6 +37,23 @@
           </div>
         </div>
       </div>
+<!--      连线-->
+      <div class="col-gap">
+        <div class="line-box">
+          <div class="line-left"></div>
+          <div class="line-right">
+            <div></div>
+            <div></div>
+          </div>
+        </div>
+        <div class="line-box">
+          <div class="line-left"></div>
+          <div class="line-right">
+            <div></div>
+            <div></div>
+          </div>
+        </div>
+      </div>
 <!--      半决赛-->
       <div class="col">
         <div
@@ -65,6 +82,16 @@
               <p>{{ item.competitor2.name }}</p>
             </div>
             <p>{{ item.competitor2.score ? item.competitor2.score : '' }}</p>
+          </div>
+        </div>
+      </div>
+<!--      连线-->
+      <div class="col-gap">
+        <div class="line-box" style="height: 50%">
+          <div class="line-left"></div>
+          <div class="line-right">
+            <div></div>
+            <div></div>
           </div>
         </div>
       </div>
@@ -177,7 +204,6 @@ onMounted(async () => {
 
 .content{
   display: flex;
-  justify-content: space-between;
 }
 
 .col{
@@ -230,5 +256,36 @@ onMounted(async () => {
   justify-content: space-between;
   box-sizing: border-box;
   margin: 5px 10px;
+}
+
+.col-gap{
+  width: 5%;
+  height: 70vh;
+  min-height: 528px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.line-box{
+  width: 100%;
+  height: 27%;
+  display: flex;
+  .line-left{
+    width: 50%;
+    height: 100%;
+    border-top: silver solid 2px;
+    border-right: silver solid 2px;
+    border-bottom: silver solid 2px;
+  }
+  .line-right{
+    width: 50%;
+    height: 100%;
+  }
+  .line-right>div:first-child{
+    width: 100%;
+    height: 50%;
+    border-bottom: silver solid 2px;
+  }
 }
 </style>
