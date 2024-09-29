@@ -12,6 +12,37 @@ interface Selected {
   firstname:string
 }
 
+interface Competitor {
+  countryEN: string;
+  name: string;
+  score: string;
+  isWinner: boolean;
+}
+
+interface Match {
+  competitor1: Competitor;
+  competitor2: Competitor;
+}
+
+interface Final {
+  description: string;
+  allMatch: Match[];
+}
+
+interface Data {
+  id: string;
+  final: Final;
+  final2: Final;
+  halfFinal: Final;
+  qFinal: Final;
+}
+
+interface ApiResponse {
+  code: number;
+  message: string | null;
+  data: Data;
+}
+
 export const useCompetitionStore = defineStore('competition', () => {
   //当前选择
   const storeSelected = localStorage.getItem('selected');
@@ -27,7 +58,7 @@ export const useCompetitionStore = defineStore('competition', () => {
   const projects = ref(storeProject ? JSON.parse(storeProject) : []);
   //对阵信息
   const storeInfo = localStorage.getItem('information');
-  const information = ref(storeInfo ? JSON.parse(storeInfo) : []);
+  const information = ref<Data>(storeInfo ? JSON.parse(storeInfo) : {});
 //"七人制橄榄球",
   const fetchTypes = async (firstname:string) => {
     try {

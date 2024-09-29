@@ -1,19 +1,140 @@
 <template>
   <div class="container">
-    <div>
-
-    </div>
     <div class="header">
       <h1>1/4决赛</h1>
       <h1>半决赛</h1>
       <h1>决赛</h1>
     </div>
     <div class="content">
+<!--       1/4决赛-->
       <div class="col">
-
+        <div
+          class="item"
+          v-for="(item,index) in competitionStore.information.qFinal.allMatch"
+          :key="index"
+        >
+          <div class="competitor">
+            <div class="nation">
+              <img
+                :src="'https://olympics.com/OG2024/assets/images/flags/OG2024/' + item.competitor1.countryEN + '.webp'"
+                alt=""
+                style="height: 25px;margin-right: 10px;border: silver solid 1px;"
+              >
+              <p>{{ item.competitor1.name }}</p>
+            </div>
+            <p>{{ item.competitor1.score ? item.competitor1.score : '' }}</p>
+          </div>
+          <div class="competitor">
+            <div class="nation">
+              <img
+                :src="'https://olympics.com/OG2024/assets/images/flags/OG2024/' + item.competitor2.countryEN + '.webp'"
+                alt=""
+                style="height: 25px;margin-right: 10px;border: silver solid 1px;"
+              >
+              <p>{{ item.competitor2.name }}</p>
+            </div>
+            <p>{{ item.competitor2.score ? item.competitor2.score : '' }}</p>
+          </div>
+        </div>
       </div>
-      <div class="col"></div>
-      <div class="col"></div>
+<!--      半决赛-->
+      <div class="col">
+        <div
+          class="item"
+          v-for="(item,index) in competitionStore.information.halfFinal.allMatch"
+          :key="index"
+        >
+          <div class="competitor">
+            <div class="nation">
+              <img
+                :src="'https://olympics.com/OG2024/assets/images/flags/OG2024/' + item.competitor1.countryEN + '.webp'"
+                alt=""
+                style="height: 25px;margin-right: 10px;border: silver solid 1px;"
+              >
+              <p>{{ item.competitor1.name }}</p>
+            </div>
+            <p>{{ item.competitor1.score ? item.competitor1.score : '' }}</p>
+          </div>
+          <div class="competitor">
+            <div class="nation">
+              <img
+                :src="'https://olympics.com/OG2024/assets/images/flags/OG2024/' + item.competitor2.countryEN + '.webp'"
+                alt=""
+                style="height: 25px;margin-right: 10px;border: silver solid 1px;"
+              >
+              <p>{{ item.competitor2.name }}</p>
+            </div>
+            <p>{{ item.competitor2.score ? item.competitor2.score : '' }}</p>
+          </div>
+        </div>
+      </div>
+<!--      决赛-->
+      <div class="col-final">
+        <div
+          class="item"
+          v-for="(item,index) in competitionStore.information.final.allMatch"
+          :key="index"
+        >
+          <div style="border-bottom: silver solid 1px;">
+            <h3>{{ competitionStore.information.final.description }}</h3>
+          </div>
+          <div class="competitor">
+            <div class="nation">
+              <img
+                :src="'https://olympics.com/OG2024/assets/images/flags/OG2024/' + item.competitor1.countryEN + '.webp'"
+                alt=""
+                style="height: 25px;margin-right: 10px;border: silver solid 1px;"
+              >
+              <p>{{ item.competitor1.name }}</p>
+            </div>
+            <p>{{ item.competitor1.score ? item.competitor1.score : '' }}</p>
+          </div>
+          <div class="competitor">
+            <div class="nation">
+              <img
+                :src="'https://olympics.com/OG2024/assets/images/flags/OG2024/' + item.competitor2.countryEN + '.webp'"
+                alt=""
+                style="height: 25px;margin-right: 10px;border: silver solid 1px;"
+              >
+              <p>{{ item.competitor2.name }}</p>
+            </div>
+            <p>{{ item.competitor2.score ? item.competitor2.score : '' }}</p>
+          </div>
+        </div>
+        <div v-if="competitionStore.information.final2.allMatch.length > 0">
+          <div
+            class="item"
+            v-for="(item,index) in competitionStore.information.final2.allMatch"
+            :key="index"
+          >
+            <div style="border-bottom: silver solid 1px;">
+              <h3>{{ competitionStore.information.final2.description }}</h3>
+            </div>
+            <div class="competitor">
+              <div class="nation">
+                <img
+                  :src="'https://olympics.com/OG2024/assets/images/flags/OG2024/' + item.competitor1.countryEN + '.webp'"
+                  alt=""
+                  style="height: 25px;margin-right: 10px;border: silver solid 1px;"
+                >
+                <p>{{ item.competitor1.name }}</p>
+              </div>
+              <p>{{ item.competitor1.score ? item.competitor1.score : '' }}</p>
+            </div>
+            <div class="competitor">
+              <div class="nation">
+                <img
+                  :src="'https://olympics.com/OG2024/assets/images/flags/OG2024/' + item.competitor2.countryEN + '.webp'"
+                  alt=""
+                  style="height: 25px;margin-right: 10px;border: silver solid 1px;"
+                >
+                <p>{{ item.competitor2.name }}</p>
+              </div>
+              <p>{{ item.competitor2.score ? item.competitor2.score : '' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -28,14 +149,13 @@ onMounted(async () => {
   await competitionStore.fetchProject()
   await competitionStore.fetchTypes(competitionStore.selected.firstname)
   await competitionStore.fetchInfo(competitionStore.selected.type.id)
-  console.log('competitionStore.projects',competitionStore.projects)
-  console.log('competitionStore.types',competitionStore.types)
 })
 </script>
 
 <style scoped>
 .container{
   width: 90%;
+  min-width: 1024px;
   margin: 0 auto;
   box-sizing: border-box;
 }
@@ -63,6 +183,52 @@ onMounted(async () => {
 .col{
   width: 30%;
   height: 70vh;
-  background-color: antiquewhite;
+  min-width: 265px;
+  min-height: 528px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.col-final{
+  width: 30%;
+  height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  position: relative;
+}
+
+.col-final>div:first-child{
+  width: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.item{
+  display: flex;
+  flex-direction: column;
+  border: silver solid 1px;
+  border-radius: 10px;
+  h3{
+    margin: 5px 15px;
+  }
+}
+
+.nation{
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  box-sizing: border-box;
+  padding-left: 1vw;
+}
+
+.competitor{
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+  margin: 5px 10px;
 }
 </style>

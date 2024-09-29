@@ -36,7 +36,7 @@
               <img
                 :src="'https://olympics.com/OG2024/assets/images/flags/OG2024/' + item.organisation + '.webp'"
                 alt=""
-                style="height: 25px;margin-right: 10px"
+                style="height: 25px;margin-right: 10px;border: silver solid 1px;"
               >
               <p>{{item.description}}</p>
             </div>
