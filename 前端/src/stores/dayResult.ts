@@ -20,12 +20,6 @@ interface Event {
   competitors: Competitor[];
 }
 
-interface DayResultResponse {
-  code: number;
-  message: string;
-  data: Event[];
-}
-
 export const useDayResultStore = defineStore('dayResult',()=> {
   //选择日期
   const storeDate = localStorage.getItem('date')
@@ -33,7 +27,7 @@ export const useDayResultStore = defineStore('dayResult',()=> {
   // const date= ref('2024-07-24')
   //所选日期赛程
   const storeDayResults = localStorage.getItem('dayResults')
-  const dayResults= ref(storeDayResults?JSON.parse(storeDayResults):[])
+  const dayResults= ref<Event[]>(storeDayResults?JSON.parse(storeDayResults):[])
 
   const fetchDayResults = async (date:string) => {
     try {

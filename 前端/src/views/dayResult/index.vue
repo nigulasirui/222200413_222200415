@@ -8,6 +8,7 @@
         class="item"
         v-for="(item,index) in dayResultStore.dayResults"
         :key="index"
+        @click="handleGo(item)"
       >
         <div class="top">
           <div style="border-right: silver solid 1px">
@@ -45,6 +46,8 @@
 
 <script setup lang="ts">
 import { useDayResultStore } from '@/stores/dayResult'
+import { useCompeteDetailStore } from '@/stores/competeDetail'
+import router from '@/router'
 // import { onMounted, ref } from 'vue'
 // interface Competitor {
 //   noc: string;
@@ -65,6 +68,29 @@ import { useDayResultStore } from '@/stores/dayResult'
 // }
 const dayResultStore = useDayResultStore()
 
+interface Competitor {
+  noc: string;
+  name: string;
+  result: {
+    mark: string;
+  };
+}
+
+interface Event {
+  disciplineName: string;
+  eventUnitName: string;
+  id: string;
+  disciplineCode: string;
+  eventId: string;
+  startDate: string;
+  competitors: Competitor[];
+}
+
+const competeDetailStore = useCompeteDetailStore()
+const handleGo=async (item: Event) => {
+  await competeDetailStore.fetchCompeteDetail(item.disciplineCode, item.eventId)
+  await router.push('/detail')
+}
 </script>
 
 <style scoped>

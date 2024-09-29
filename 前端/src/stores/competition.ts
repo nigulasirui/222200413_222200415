@@ -37,12 +37,6 @@ interface Data {
   qFinal: Final;
 }
 
-interface ApiResponse {
-  code: number;
-  message: string | null;
-  data: Data;
-}
-
 export const useCompetitionStore = defineStore('competition', () => {
   //当前选择
   const storeSelected = localStorage.getItem('selected');

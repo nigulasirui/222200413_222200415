@@ -127,7 +127,7 @@ const handleProjectChange=async (item: string) => {
   await competeStore.fetchTypes(competeStore.selected.firstname)
   competeStore.selected.type=competeStore.types[0]
   //update info (默认type)
-
+  await competeStore.fetchInfo(competeStore.selected.type.id)
 }
 
 interface Type {
