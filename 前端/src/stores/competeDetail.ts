@@ -36,6 +36,11 @@ const matchData = {
   }
 };
 
+interface Status{
+  code:number,
+  message:string,
+}
+
 export const useCompeteDetailStore = defineStore('competeDetail', () => {
   //项目全部组别数据
   const storeCompeteDetail = localStorage.getItem('competeDetail');
@@ -47,7 +52,7 @@ export const useCompeteDetailStore = defineStore('competeDetail', () => {
   const defaultData = computed(()=>selectResult.value[0])
   const selected = ref<Result>(defaultData.value ? defaultData.value : matchData)
   //获取全部组别数据
-  const fetchCompeteDetail = async (disciplineCode:string,eventId:string) => {
+  const fetchCompeteDetail = async (disciplineCode:string,eventId:string):Promise<Status> => {
     try {
       const response = await axios.get(`api/dataget/GetResultCombine`,{
         params:{ disciplineCode,eventId }
@@ -59,11 +64,11 @@ export const useCompeteDetailStore = defineStore('competeDetail', () => {
         competeDetail.value = data;
         localStorage.setItem('competeDetail', JSON.stringify(competeDetail.value));
         // console.log(competeDetail.value);
-      } else {
-        console.error(message);
       }
+      return { code, message };
     } catch (error) {
       console.error(error);
+      return { code: 0, message: '请求失败' };
     }
   };
 

@@ -71,10 +71,14 @@ interface Event {
 }
 
 const competeDetailStore = useCompeteDetailStore()
-const handleGo=async (item: Event) => {
-  console.log(item)
-  await competeDetailStore.fetchCompeteDetail(item.disciplineCode, item.eventId)
-  await router.push('/detail')
+const handleGo= async (item: Event) => {
+  const resp = await competeDetailStore.fetchCompeteDetail(item.disciplineCode, item.eventId)
+  if (resp.code===1){
+    await router.push('/detail')
+  }
+  else {
+    alert(resp.message)
+  }
 }
 </script>
 

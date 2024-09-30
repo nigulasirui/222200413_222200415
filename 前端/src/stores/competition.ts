@@ -2,6 +2,11 @@ import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import axios from '@/plugins/axios';
 
+interface Status{
+  code: number;
+  message: string;
+}
+
 interface Type {
   id:string,
   description:string
@@ -54,7 +59,7 @@ export const useCompetitionStore = defineStore('competition', () => {
   const storeInfo = localStorage.getItem('information');
   const information = ref<Data>(storeInfo ? JSON.parse(storeInfo) : {});
 //"七人制橄榄球",
-  const fetchTypes = async (firstname:string) => {
+  const fetchTypes = async (firstname:string):Promise<Status> => {
     try {
       const response = await axios.get(`/api/dataget/GetAllMatchDetailName`,{
         params:{ firstname }
@@ -65,15 +70,15 @@ export const useCompetitionStore = defineStore('competition', () => {
         types.value = data;
         localStorage.setItem('types', JSON.stringify(types.value));
         // console.log(types.value);
-      } else {
-        console.error(message);
       }
+      return { code, message };
     } catch (error) {
       console.error(error);
+      return { code: 0, message: '请求失败' };
     }
   };
 //无参
-  const fetchProject = async () => {
+  const fetchProject = async ():Promise<Status> => {
     try {
       const response = await axios.get('/api/dataget/GetAllMatchName');
       const { code, message, data } = response.data;
@@ -82,11 +87,11 @@ export const useCompetitionStore = defineStore('competition', () => {
         projects.value = data;
         localStorage.setItem('projects', JSON.stringify(projects.value));
         // console.log(projects.value);
-      } else {
-        console.error(message);
       }
+      return { code, message };
     } catch (error) {
       console.error(error);
+      return { code: 0, message: '请求失败' };
     }
   };
 //{
@@ -97,7 +102,7 @@ export const useCompetitionStore = defineStore('competition', () => {
 //             "id": "FBLWTEAM11------------------------",
 //             "description": "女子"
 //         }
-  const fetchInfo = async (id:string) => {
+  const fetchInfo = async (id:string):Promise<Status> => {
     try {
       const response = await axios.get(`/api/dataget/GetBattleTable`,{
         params:{ id }
@@ -108,11 +113,11 @@ export const useCompetitionStore = defineStore('competition', () => {
         information.value = data;
         localStorage.setItem('information', JSON.stringify(information.value));
         // console.log(information.value);
-      } else {
-        console.error(message);
       }
+      return { code, message };
     } catch (error) {
       console.error(error);
+      return { code: 0, message: '请求失败' };
     }
   };
 

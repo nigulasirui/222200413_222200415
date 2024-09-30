@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useDayResultStore } from '@/stores/dayResult'
 import { useCompetitionStore } from '@/stores/competition'
-import { useCompeteDetailStore } from '@/stores/competeDetail'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -51,11 +50,6 @@ const router = createRouter({
       path: '/detail',
       name: 'Detail',
       component: ()=>import('@/views/detail/index.vue'),
-      // beforeEnter: async (to, from, next) => {
-      //   const competeDetailStore = useCompeteDetailStore()
-      //   competeDetailStore.fetchCompeteDetail()
-      //   next()
-      // },
       children:[
         {
           path:'/matchDetail',
