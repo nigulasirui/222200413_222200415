@@ -10,7 +10,7 @@
       @click="Go('/home')"
     >首页</el-button>
     <el-button
-      :class="{ active: route.path === '/dayResult' }"
+      :class="{ active: route.path === '/dayResult'||route.path==='/detail' }"
       round
       @click="Go('/dayResult')"
     >每日赛程</el-button>

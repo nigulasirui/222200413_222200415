@@ -168,15 +168,15 @@
 
 <script setup lang="ts">
 import { useCompetitionStore } from '@/stores/competition'
-import { onMounted } from 'vue'
+// import { onMounted } from 'vue'
 
 const competitionStore = useCompetitionStore()
 
-onMounted(async () => {
-  await competitionStore.fetchProject()
-  await competitionStore.fetchTypes(competitionStore.selected.firstname)
-  await competitionStore.fetchInfo(competitionStore.selected.type.id)
-})
+// onMounted(async () => {
+//   await competitionStore.fetchProject()
+//   await competitionStore.fetchTypes(competitionStore.selected.firstname)
+//   await competitionStore.fetchInfo(competitionStore.selected.type.id)
+// })
 </script>
 
 <style scoped>
