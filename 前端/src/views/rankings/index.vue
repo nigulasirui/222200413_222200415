@@ -27,16 +27,16 @@
           <img
             :src="'https://olympics.com/OG2024/assets/images/flags/OG2024/' + item.organisation + '.webp'"
             alt=""
-            style="height: 25px;margin-right: 10px"
+            style="height: 25px;margin-right: 10px;border: silver solid 1px;"
           >
-          <p>美国</p>
+          <p>{{item.description}}</p>
         </div>
       </div>
       <div class="data">
-        <div class="item">{{item.gold}}</div>
-        <div class="item">{{item.silver}}</div>
-        <div class="item">{{item.bronze}}</div>
-        <div class="item">{{item.total}}</div>
+        <p class="item">{{item.gold}}</p>
+        <p class="item">{{item.silver}}</p>
+        <p class="item">{{item.bronze}}</p>
+        <p class="item">{{item.total}}</p>
       </div>
     </div>
   </div>
@@ -47,29 +47,28 @@ import gold from '@/assets/rankingImg/gold.png'
 import silver from '@/assets/rankingImg/silver.png'
 import bronze from '@/assets/rankingImg/bronze.png'
 import total from '@/assets/rankingImg/total.png'
+import { onMounted, ref } from 'vue'
+import { useMedalStore } from '@/stores/medals'
 
 const medalImage = [ gold,silver,bronze,total ];
 
-const data=[
-  {
-    organisation: "USA",
-    description: "美国",
-    rank: 1,
-    gold: 40,
-    silver: 44,
-    bronze: 42,
-    total: 126
-  },
-  {
-    organisation: "USA",
-    description: "美国",
-    rank: 2,
-    gold: 40,
-    silver: 44,
-    bronze: 42,
-    total: 126
-  }
-]
+interface Medal {
+  organisation: string;
+  description: string;
+  rank: number;
+  gold: number;
+  silver: number;
+  bronze: number;
+  total: number;
+}
+const data = ref<Medal[]>([]);
+const medalStore = useMedalStore();
+
+onMounted(async () => {
+  await medalStore.fetchMedals()
+  data.value = medalStore.medals
+})
+
 </script>
 
 <style scoped>
@@ -108,7 +107,7 @@ const data=[
 .data{
   display: flex;
   width: 60%;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-around;
   img{
     display: block;
@@ -118,6 +117,8 @@ const data=[
 
 .item{
   height: 35px;
+  text-align: center;
+  vertical-align: middle;
   margin: 0 3vw;
 }
 </style>

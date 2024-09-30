@@ -31,14 +31,14 @@
           v-for="(item, index) in data" :key="index"
         >
           <div class="head">
-            <div>{{ item.rank }}</div>
+            <div style="width: 10px">{{ item.rank }}</div>
             <div style="margin: 0 3vw;display: flex;align-items: center;">
               <img
                 :src="'https://olympics.com/OG2024/assets/images/flags/OG2024/' + item.organisation + '.webp'"
                 alt=""
-                style="height: 25px;margin-right: 10px"
+                style="height: 25px;margin-right: 10px;border: silver solid 1px;"
               >
-              <p>美国</p>
+              <p>{{item.description}}</p>
             </div>
           </div>
           <div class="data">
@@ -65,61 +65,46 @@
 </template>
 
 <script setup lang="ts">
-import router from '@/router'
-
 import swiper1 from '@/assets/img/carousel_img1.png';
 import swiper2 from '@/assets/img/carousel_img2.png';
 import swiper3 from '@/assets/img/carousel_img3.png';
 import swiper4 from '@/assets/img/carousel_img4.png';
 import swiper5 from '@/assets/img/carousel_img5.png';
-const swiperImages = [ swiper1, swiper2, swiper3, swiper4, swiper5 ];
-
 import gold from '@/assets/rankingImg/gold.png'
 import silver from '@/assets/rankingImg/silver.png'
 import bronze from '@/assets/rankingImg/bronze.png'
 import total from '@/assets/rankingImg/total.png'
+import { onMounted, ref } from 'vue'
+import router from '@/router'
+import { useMedalStore } from '@/stores/medals';
 
+const swiperImages = [ swiper1, swiper2, swiper3, swiper4, swiper5 ];
 const medalImage = [ gold,silver,bronze,total ];
 
-const data=[
-  {
-    organisation: "USA",
-    description: "美国",
-    rank: 1,
-    gold: 40,
-    silver: 44,
-    bronze: 42,
-    total: 126
-  },
-  {
-    organisation: "USA",
-    description: "美国",
-    rank: 2,
-    gold: 40,
-    silver: 44,
-    bronze: 42,
-    total: 126
-  }
-]
+interface Medal {
+  organisation: string;
+  description: string;
+  rank: number;
+  gold: number;
+  silver: number;
+  bronze: number;
+  total: number;
+}
+
+const data = ref<Medal[]>([]);
+const medalStore = useMedalStore();
+
+onMounted(async () => {
+  await medalStore.fetchMedals()
+  // data.value = medalStore.medals
+  data.value = medalStore.medals.slice(0, 7);
+  console.log('home');
+})
 
 function Go(path: string): void {
   router.push(path)
 }
-// import axios from '@/plugins/axios';
-// import { ref, onMounted } from 'vue';
-//
-// const nations = ref([]);
-//
-// const fetchNations = async () => {
-//   try {
-//     const response = await axios.get('/api/dataget/GetAllNationalMedals');
-//     nations.value = response.data;
-//     console.log(response.data);
-//   } catch (error) {
-//     console.error(error);
-//   }
-// };
-// onMounted(fetchNations);
+
 </script>
 
 <style scoped>

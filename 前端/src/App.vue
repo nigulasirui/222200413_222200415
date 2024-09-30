@@ -8,10 +8,10 @@ import navigation from './components/navigation.vue';
       <navigation />
     </el-header>
 
-    <RouterView style="margin-top: 6vh"/>
-<!--    <el-main>-->
-<!--      <RouterView />-->
-<!--    </el-main>-->
+    <keep-alive>
+      <RouterView style="margin-top: 6vh"/>
+    </keep-alive>
+
   </el-container>
 </template>
 
