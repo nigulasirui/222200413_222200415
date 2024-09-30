@@ -253,11 +253,12 @@ namespace OlympicSearchServer
             string savePath = Path.Combine(ResourcesPath, "ResultCombine", eventId.Substring(0,11)+".json");
             if (File.Exists(savePath))
             {
-                string json=File.ReadAllText(savePath);
+                string json = File.ReadAllText(savePath);
                 ResultCombineJsonUse result = JsonConvert.DeserializeObject<ResultCombineJsonUse>(json);
                 return result;
 
-            }
+            }//能用的数据以及全部获取到了，为减少响应时间故直接返回null
+            else return null;
 
             string http = DataPraser.GetSchedulesHttp(disciplineCode);
             var jsonResult = DataPraser.Communicable(http);
