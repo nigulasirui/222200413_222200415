@@ -74,7 +74,12 @@ const competeDetailStore = useCompeteDetailStore()
 const handleGo= async (item: Event) => {
   const resp = await competeDetailStore.fetchCompeteDetail(item.disciplineCode, item.eventId)
   if (resp.code===1){
-    await router.push('/detail')
+    await router.push({
+      path: '/detail',
+      query: {
+        disciplineName: item.disciplineName
+      }
+    })
   }
   else {
     alert(resp.message)

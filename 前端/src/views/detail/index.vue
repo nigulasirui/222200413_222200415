@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <div class="detail">
+      <h1 style="font-size: 30px;text-align: center">{{ route.query.disciplineName }}</h1>
       <h1 style="text-align: center">全场比赛结束</h1>
       <div class="compete">
         <div class="competitor">
@@ -29,22 +30,26 @@
     </div>
 
     <div class="selected">
+
       <div class="group">
         <el-button
           type="info"
           plain
           v-for="(item,index) in competeDetailStore.competeDetail"
           :key="index"
+          :class="{ active: arraysEqual(item.results,competeDetailStore.selectResult) }"
           @click="handleGroup(item)"
         >
           {{ item.stateName }}
         </el-button>
       </div>
+
       <div class="group-item">
         <div
           class="item"
           v-for="(item,index) in competeDetailStore.selectResult"
           :key="index"
+          :class="{ active: itemEqual(item, competeDetailStore.selected) }"
           @click="handleItem(item)"
         >
           <div
@@ -81,6 +86,8 @@
 </template>
 
 <script setup lang="ts">
+import { useRoute } from 'vue-router'
+const route = useRoute()
 import { useCompeteDetailStore } from '@/stores/competeDetail'
 
 interface Competitor {
@@ -111,6 +118,59 @@ const handleGroup = (item:State)=>{
 const handleItem = (item:Result)=>{
   competeDetailStore.selected=item
 }
+//button active
+const competitorEqual = (comp1: Competitor, comp2: Competitor): boolean => {
+  return (
+    comp1.countryEN === comp2.countryEN &&
+    comp1.name === comp2.name &&
+    comp1.score === comp2.score &&
+    comp1.isWinner === comp2.isWinner
+  );
+};
+
+const resultEqual = (result1: Result, result2: Result): boolean => {
+  return (
+    result1.startDate === result2.startDate &&
+    competitorEqual(result1.competitor1, result2.competitor1) &&
+    competitorEqual(result1.competitor2, result2.competitor2)
+  );
+};
+
+const arraysEqual = (arr1: Result[], arr2: Result[]): boolean => {
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+
+  for (let i = 0; i < arr1.length; i++) {
+    if (!resultEqual(arr1[i], arr2[i])) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+//item active
+const itemEqual=(obj1: any, obj2: any): boolean =>{
+  if (obj1 === obj2) {
+    return true;
+  }
+
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+
+  if (keys1.length !== keys2.length) {
+    return false;
+  }
+
+  for (const key of keys1) {
+    if (obj1[key] !== obj2[key]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 </script>
 
 <style scoped>
@@ -144,7 +204,7 @@ const handleItem = (item:Result)=>{
   display: flex;
   align-items: center;
   p{
-    font-size: 30px;
+    font-size: 20px;
     font-weight: bold;
   }
 }
