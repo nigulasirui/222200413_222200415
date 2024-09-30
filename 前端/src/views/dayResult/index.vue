@@ -36,7 +36,7 @@
               >
               <p>{{ competitor.name }}</p>
             </div>
-            <p>{{ competitor.result ? competitor.result.mark : '' }}</p>
+            <p>{{ competitor.results ? competitor.results.mark : '' }}</p>
           </div>
         </div>
       </div>
@@ -48,32 +48,16 @@
 import { useDayResultStore } from '@/stores/dayResult'
 import { useCompeteDetailStore } from '@/stores/competeDetail'
 import router from '@/router'
-// import { onMounted, ref } from 'vue'
-// interface Competitor {
-//   noc: string;
-//   name: string;
-//   results: {
-//     mark: string;
-//   };
-// }
-//
-// interface Event {
-//   disciplineName: string;
-//   eventUnitName: string;
-//   id: string;
-//   disciplineCode: string;
-//   eventId: string;
-//   startDate: string;
-//   competitors: Competitor[];
-// }
 const dayResultStore = useDayResultStore()
+
+interface Result {
+  mark:string
+}
 
 interface Competitor {
   noc: string;
   name: string;
-  result: {
-    mark: string;
-  };
+  results: Result;
 }
 
 interface Event {
@@ -87,9 +71,14 @@ interface Event {
 }
 
 const competeDetailStore = useCompeteDetailStore()
-const handleGo=async (item: Event) => {
-  await competeDetailStore.fetchCompeteDetail(item.disciplineCode, item.eventId)
-  await router.push('/detail')
+const handleGo= async (item: Event) => {
+  const resp = await competeDetailStore.fetchCompeteDetail(item.disciplineCode, item.eventId)
+  if (resp.code===1){
+    await router.push('/detail')
+  }
+  else {
+    alert(resp.message)
+  }
 }
 </script>
 

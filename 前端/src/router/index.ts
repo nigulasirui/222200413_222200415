@@ -42,6 +42,11 @@ const router = createRouter({
       }
     },
     {
+      path: '/about',
+      name: 'About',
+      component: ()=>import('@/views/about/index.vue'),
+    },
+    {
       path: '/detail',
       name: 'Detail',
       component: ()=>import('@/views/detail/index.vue'),
@@ -58,15 +63,6 @@ const router = createRouter({
         },
       ]
     },
-    // {
-    //   path: '/404',
-    //   name: '404',
-    //   component: () => import('@/views/pages/404.vue'),
-    // },
-    // {
-    //   path: '/:path(.*)',
-    //   redirect: '/404'
-    // },
   ]
 })
 

@@ -168,15 +168,9 @@
 
 <script setup lang="ts">
 import { useCompetitionStore } from '@/stores/competition'
-// import { onMounted } from 'vue'
 
 const competitionStore = useCompetitionStore()
 
-// onMounted(async () => {
-//   await competitionStore.fetchProject()
-//   await competitionStore.fetchTypes(competitionStore.selected.firstname)
-//   await competitionStore.fetchInfo(competitionStore.selected.type.id)
-// })
 </script>
 
 <style scoped>
@@ -256,6 +250,11 @@ const competitionStore = useCompetitionStore()
   justify-content: space-between;
   box-sizing: border-box;
   margin: 5px 10px;
+}
+
+.competitor:hover{
+  transform: scale(1.05);
+  font-weight: bold;
 }
 
 .col-gap{
