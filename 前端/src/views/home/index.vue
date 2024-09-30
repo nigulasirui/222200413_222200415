@@ -98,7 +98,7 @@ onMounted(async () => {
   await medalStore.fetchMedals()
   // data.value = medalStore.medals
   data.value = medalStore.medals.slice(0, 7);
-  console.log('home');
+  // console.log('home');
 })
 
 function Go(path: string): void {
@@ -168,6 +168,12 @@ function Go(path: string): void {
 
 .bar-bg:last-child{
   margin-bottom: 50px;
+}
+
+.bar-bg:hover {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  transform: translateY(-3px);
+  transition: transform 0.3s ease;
 }
 
 .head{

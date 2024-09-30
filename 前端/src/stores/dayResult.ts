@@ -2,12 +2,14 @@ import axios from '@/plugins/axios';
 import { ref } from 'vue';
 import { defineStore } from 'pinia'
 
+interface Result {
+  mark:string
+}
+
 interface Competitor {
   noc: string;
   name: string;
-  result: {
-    mark: string;
-  };
+  results: Result;
 }
 
 interface Event {

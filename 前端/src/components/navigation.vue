@@ -24,6 +24,11 @@
       round
       @click="Go('/compete')"
     >对阵表</el-button>
+    <el-button
+      :class="{ active: route.path === '/about' }"
+      round
+      @click="Go('/about')"
+    >了解更多</el-button>
     <div class="select">
       <el-date-picker
         v-if="route.path === '/dayResult'"
