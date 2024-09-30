@@ -19,31 +19,31 @@ namespace StudentDB_Scripts
         static void Main(string[] args)
         {
 
-            
 
 
-            // 7595 是端口，可以改成喜欢的
-            var config = new HttpSelfHostConfiguration("http://localhost:7595");
-            config.EnableCors();
-            config.EnableCors(new EnableCorsAttribute("*", "*", "*"));
-            config.Formatters.XmlFormatter.SupportedMediaTypes.Clear();
 
-            // 定义路由，这里不需要改
-            config.Routes.MapHttpRoute(
-                name: "DefaultApi",  // 可以改成喜欢的名字，xxxApi
-                routeTemplate: "api/{controller}/{action}",
-                defaults: new { id = RouteParameter.Optional }
-            );
+            //// 7595 是端口，可以改成喜欢的
+            //var config = new HttpSelfHostConfiguration("http://localhost:7595");
+            //config.EnableCors();
+            //config.EnableCors(new EnableCorsAttribute("*", "*", "*"));
+            //config.Formatters.XmlFormatter.SupportedMediaTypes.Clear();
 
-            var server = new HttpSelfHostServer(config);
-            server.OpenAsync().Wait();  // 启动服务器
+            //// 定义路由，这里不需要改
+            //config.Routes.MapHttpRoute(
+            //    name: "DefaultApi",  // 可以改成喜欢的名字，xxxApi
+            //    routeTemplate: "api/{controller}/{action}",
+            //    defaults: new { id = RouteParameter.Optional }
+            //);
 
-            Console.WriteLine("服务器已启动，按回车停止。");
+            //var server = new HttpSelfHostServer(config);
+            //server.OpenAsync().Wait();  // 启动服务器
 
-            Console.ReadLine();
+            //Console.WriteLine("服务器已启动，按回车停止。");
 
-            
-            
+            //Console.ReadLine();
+
+
+            DataPraser.UpdateResultCombine();
 
 
             //DataPraser mid=new DataPraser();

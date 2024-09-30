@@ -12,6 +12,7 @@ using static OlympicSearchServer.BattleTableData.BattleResult.MatchResult;
 using static OlympicSearchServer.DateMatchDetails;
 using static OlympicSearchServer.DateMatchDetails.Units.Competitors;
 using static OlympicSearchServer.MatchNameData.Props.PageProps.InitialFilterDisciplines;
+using static OlympicSearchServer.MatchNameData.Props.PageProps.InitialFilterDisciplines.Disciplines;
 using static OlympicSearchServer.ResultCombine;
 
 namespace OlympicSearchServer
@@ -204,12 +205,48 @@ namespace OlympicSearchServer
 
 
             }
-
-
             return result;
 
         }
+        public static void UpdateResultCombine()
+        {
+            string[] allFiles = Directory.GetFiles(Path.Combine(ResourcesPath, "ResultCombine"));
+            foreach(var a in allFiles)
+            {
+                string json = File.ReadAllText(a);
+                ResultCombineJsonUse result = JsonConvert.DeserializeObject<ResultCombineJsonUse>(json);
+                //处理
+                List<ResultCombine> allResults = result.resultCombines;
+                //比赛阶段
+                allResults.Sort((x, y) => TestCompare(x,y));
 
+
+                File.WriteAllText(a, JsonConvert.SerializeObject(result));
+            }
+
+        }
+
+        public static int TestCompare(ResultCombine x, ResultCombine y)
+        {
+            if (x.stateName.Contains("金") || x.stateName.Equals("决赛")) return 1000;
+            if (y.stateName.Contains("金") || y.stateName.Equals("决赛")) return -1000;
+            if (x.stateName.Contains("铜")) return 500;
+            if (y.stateName.Contains("铜")) return -500;
+            if (x.stateName.Contains("半决赛")) return 200;
+            if (y.stateName.Contains("半决赛")) return -200;
+            if (x.stateName.Contains("1/4")) return 100;
+            if (y.stateName.Contains("1/4")) return -100;
+            if (x.stateName.Substring(0, 2).Equals(y.stateName.Substring(0, 2)) )
+            {
+                return x.stateName.CompareTo(y.stateName);
+            }
+            if (x.stateName.Length.Equals(y.stateName.Length))
+            {
+                return y.results.Count.CompareTo(x.results.Count);
+            }
+            return x.results.Count.CompareTo(y.results.Count);
+
+        }
 
         public static ResultCombineJsonUse GetResultCombine(string disciplineCode, string eventId)
         {
