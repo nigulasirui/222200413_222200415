@@ -22,6 +22,11 @@ interface Event {
   competitors: Competitor[];
 }
 
+interface Status{
+  code:number,
+  message:string,
+}
+
 export const useDayResultStore = defineStore('dayResult',()=> {
   //选择日期
   const storeDate = localStorage.getItem('date')
@@ -31,7 +36,7 @@ export const useDayResultStore = defineStore('dayResult',()=> {
   const storeDayResults = localStorage.getItem('dayResults')
   const dayResults= ref<Event[]>(storeDayResults?JSON.parse(storeDayResults):[])
 
-  const fetchDayResults = async (date:string) => {
+  const fetchDayResults = async (date:string):Promise<Status> => {
     try {
       const response = await axios.get(`/api/dataget/GetDayResult`, {
         params: { date },
@@ -39,11 +44,11 @@ export const useDayResultStore = defineStore('dayResult',()=> {
       if (response.data.code === 1) {
         dayResults.value = response.data.data;
         localStorage.setItem('dayResults', JSON.stringify(dayResults.value));
-      } else {
-        console.error(response.data.message);
       }
+      return { code:response.data.code, message:response.data.message };
     } catch (error) {
       console.error('请求失败:', error);
+      return { code: 0, message: '请求失败' };
     }
   };
 

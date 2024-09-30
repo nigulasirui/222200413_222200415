@@ -65,8 +65,13 @@ const data = ref<Medal[]>([]);
 const medalStore = useMedalStore();
 
 onMounted(async () => {
-  await medalStore.fetchMedals()
-  data.value = medalStore.medals
+  const res = await medalStore.fetchMedals()
+  if (res.code===1){
+    data.value = medalStore.medals
+  }
+  else {
+    alert(res.message)
+  }
 })
 
 </script>

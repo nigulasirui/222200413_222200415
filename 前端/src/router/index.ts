@@ -25,8 +25,14 @@ const router = createRouter({
       component: ()=>import('@/views/dayResult/index.vue'),
       beforeEnter: async (to, from, next) => {
         const dayResultStore = useDayResultStore()
-        await dayResultStore.fetchDayResults(dayResultStore.date)
-        next()
+        const res = await dayResultStore.fetchDayResults(dayResultStore.date)
+        if (res.code===1){
+          next()
+        }
+        else {
+          alert(res.message)
+          next(false)
+        }
       }
     },
     {
@@ -35,10 +41,28 @@ const router = createRouter({
       component: ()=>import('@/views/compete/index.vue'),
       beforeEnter: async (to, from, next) => {
         const competitionStore = useCompetitionStore()
-        await competitionStore.fetchProject()
-        await competitionStore.fetchTypes(competitionStore.selected.firstname)
-        await competitionStore.fetchInfo(competitionStore.selected.type.id)
-        next()
+        const res1 = await competitionStore.fetchProject()
+        if (res1.code===1){
+          const res2 = await competitionStore.fetchTypes(competitionStore.selected.firstname)
+          if (res2.code===1){
+            const res3 = await competitionStore.fetchInfo(competitionStore.selected.type.id)
+            if (res3.code===1){
+              next()
+            }
+            else {
+              alert(res3.message)
+              next(false)
+            }
+          }
+          else {
+            alert(res2.message)
+            next(false)
+          }
+        }
+        else {
+          alert(res1.message)
+          next(false)
+        }
       }
     },
     {
