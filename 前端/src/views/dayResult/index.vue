@@ -36,7 +36,7 @@
               >
               <p>{{ competitor.name }}</p>
             </div>
-            <p>{{ competitor.results ? competitor.results.mark : '' }}</p>
+            <p>{{ competitor.result ? competitor.result.mark : '' }}</p>
           </div>
         </div>
       </div>

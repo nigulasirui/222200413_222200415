@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { computed, ref } from 'vue'
 import { defineStore } from 'pinia';
 import axios from '@/plugins/axios';
 
@@ -10,7 +10,7 @@ interface Competitor {
 }
 
 interface Result {
-  startDate: string; // ISO 8601 date string
+  startDate: string;
   competitor1: Competitor;
   competitor2: Competitor;
 }
@@ -20,16 +20,32 @@ interface State {
   results: Result[];
 }
 
-interface ApiResponse {
-  code: number;
-  message: string | null;
-  data: State[];
-}
-
+const matchData = {
+  startDate: "2024-08-08T17:00",
+  competitor1: {
+    countryEN: "EGY",
+    name: "Egypt",
+    score: "0",
+    isWinner: false
+  },
+  competitor2: {
+    countryEN: "MAR",
+    name: "Morocco",
+    score: "6",
+    isWinner: true
+  }
+};
 
 export const useCompeteDetailStore = defineStore('competeDetail', () => {
+  //项目全部组别数据
   const storeCompeteDetail = localStorage.getItem('competeDetail');
-  const competeDetail = ref(storeCompeteDetail ? JSON.parse(storeCompeteDetail) : []);
+  const competeDetail = ref<State[]>(storeCompeteDetail ? JSON.parse(storeCompeteDetail) : [{ stateName:'',results:[matchData]}]);
+  //所选组（默认第一组）
+  const defaultResult = computed(()=>competeDetail.value[0].results)
+  const selectResult = ref<Result[]>(defaultResult.value?defaultResult.value:[matchData])
+  //当前所选组数据（默认第一项）
+  const defaultData = computed(()=>selectResult.value[0])
+  const selected = ref<Result>(defaultData.value ? defaultData.value : matchData)
   //
   const fetchCompeteDetail = async (disciplineCode:string,eventId:string) => {
     try {
@@ -52,6 +68,8 @@ export const useCompeteDetailStore = defineStore('competeDetail', () => {
   };
 
   return {
+    selectResult,
+    selected,
     competeDetail,
     fetchCompeteDetail,
   };

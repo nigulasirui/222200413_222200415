@@ -106,7 +106,7 @@ watch(
 const dateValue = ref(new Date(dayResult.date))
 const disabledDate = (time:Date) => {
   const start = new Date('2024-07-23').getTime()
-  const end = new Date('2024-08-12').getTime()
+  const end = new Date('2024-08-11').getTime()
   return time.getTime() < start || time.getTime() > end
 }
 
